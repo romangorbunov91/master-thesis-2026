@@ -1,0 +1,183 @@
+\pagestyle{plain}
+
+            %%% ШРИФТ, АБЗАЦ, ПОЛЯ %%%
+
+\usepackage{mathtext}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{cmap}                   % для кодировки шрифтов в pdf
+\usepackage[pdftex]{lscape}         % Для ориентации страниц
+
+\usepackage[14pt]{extsizes}         % Размер шрифта 14pt.
+
+\usepackage{hyperref}
+
+\usepackage{geometry}               % Поля
+
+% Размер полей:
+\geometry{top = 20mm}
+\geometry{bottom = 20mm}
+\geometry{left = 20mm}
+\geometry{right = 10mm}
+\geometry{nofoot}
+
+\usepackage{indentfirst}            % Красная строка
+\setlength{\parindent}{2.5em}       % Размер отступа красной строки в 5 символов
+\righthyphenmin=2
+\usepackage{ulem}                   % Подчеркивания
+\usepackage[usenames, dvipsnames]{color} % цвета
+
+\usepackage{graphicx}
+\usepackage[table,xcdraw]{xcolor}
+
+\usepackage{setspace}
+\onehalfspacing                     % Полуторный интервал
+
+%\newcommand{\basegostsectionfont}{\fontsize{14pt}{16pt}\selectfont\bfseries}
+
+
+            %%% РУБРИКАЦИЯ %%%
+            
+\usepackage{misccorr}       % В заголовках появляется точка, но при ссылке на них ее нет 
+\usepackage{indentfirst}    % Абзацный отступ после заголовков
+
+\clubpenalty=10000      % Висячие строки.
+\widowpenalty=10000
+\tolerance=2000         % Терпимость к жидким строкам.
+\righthyphenmin=2       % Минимальное число символов при переносе.
+
+\usepackage{fancyhdr} % пакет для установки колонтитулов
+\pagestyle{fancy} % смена стиля оформления страниц
+\fancyhf{} % очистка текущих значений
+\fancyhead[C]{\normalsize\thepage} % установка верхнего колонтитула
+\renewcommand{\headrulewidth}{0pt} % убрать разделительную линию
+
+\usepackage{titlesec}
+
+% Оформление разделов
+\makeatletter
+    %\renewcommand{\l@section}{\@dottedtocline{1}{0.8cm}{0.8cm}}
+    \renewcommand{\thesection}{\arabic{section}}
+    \renewcommand{\section}{\@startsection{section}{1}{1.25cm}{-3.5ex plus -1ex minus -.2ex}{2.3ex plus.2ex}{\raggedright\normalfont\large\bfseries}}
+\makeatother
+
+% Оформление подразделов
+\makeatletter
+    %\renewcommand{\l@subsection}{\@dottedtocline{2}{0.8cm}{0.8cm}}
+    \renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+    \renewcommand{\subsection}{\@startsection{subsection}{2}{1.25cm}{-3.5ex plus -1ex minus -.2ex}{2.3ex plus.2ex}{\raggedright\normalfont\large\bfseries}}
+\makeatother
+
+% Оформление под-подразделов
+\makeatletter
+    \renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+    \renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{1.25cm}{-3.5ex plus -1ex minus -.2ex}{2.3ex plus.2ex}{\raggedright\normalfont\bfseries}}
+\makeatother
+
+% Оформление параграфов
+\makeatletter
+    \renewcommand{\theparagraph}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}.\arabic{paragraph}}
+    \renewcommand{\paragraph}{\@startsection{paragraph}{4}{1.25cm}{-3.5ex plus -1ex minus -.2ex}{2.3ex plus.2ex}{\raggedright\normalfont\bfseries}}
+\makeatother
+
+\makeatletter
+\renewcommand{\l@section}{\@dottedtocline{1}{0em}{1.25em}}
+\renewcommand{\l@subsection}{\@dottedtocline{2}{1.25em}{1.75em}}
+\renewcommand{\l@subsubsection}{\@dottedtocline{3}{2.75em}{2.6em}}
+\makeatother
+
+            %%% ФОРМУЛЫ %%%
+% Запятая в десятичных дробях.            
+\usepackage{icomma}
+% AMS-пакеты.
+\usepackage{amssymb, amsfonts, amsmath, amsthm, amstext, bm}
+% Нормальные интегралы.
+\usepackage{esint}
+\renewcommand{\theequation}{\arabic{subsection}.\arabic{equation}}
+\numberwithin{equation}{section}    % Нумерация формул по секциям.
+
+\newcommand{\integral}[4]
+{
+\displaystyle \int\limits_{#1}^{#2}#3\,\mathrm{d}#4
+}
+
+\newcommand{\diff}[2]
+{
+\cfrac{\mathrm{d}#1}{\mathrm{d}#2}
+}
+
+
+            %%% РИСУНКИ, ТАБЛИЦЫ, СПИСКИ %%%
+            
+\usepackage{graphicx}               % Пакет для работы с графикой
+\usepackage{longtable}              % Длинные таблицы
+\usepackage{multirow}               % Для оформления сложных таблиц
+\usepackage{array}
+\usepackage{float}
+\renewcommand{\labelenumi}{\theenumi.}
+\newenvironment{tscript}            % Окружение для ввода обозначений (два столбца).
+{\begin{tabular}{p{5mm}p{\dimexpr 1\linewidth-7mm-2\tabcolsep}}}{\end{tabular}}
+
+% объявляем новую команду для переноса строки внутри ячейки таблицы
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+            %%% ПОДПИСИ, ССЫЛКИ %%%
+            
+\usepackage{cleveref}
+%\newcommand{\crefrangeconjunction}{--}
+\crefrangeformat{equation}{#3(#1)#4--#5(#2)#6}
+            
+\usepackage{caption}
+\captionsetup{%
+singlelinecheck=off,                % Многострочные подписи, например у таблиц
+skip=2pt,                           % Вертикальная отбивка между подписью и содержимым рисунка или таблицы
+tableposition=top,                  % Подпись таблиц сверху
+labelsep=period,                    % Разделитель - точка и пробел.
+format=plain, 
+font=small, 
+labelfont=small,
+}
+\captionsetup[figure]{justification=centering}
+\captionsetup[table]{justification=raggedright}
+
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\usepackage{comment}
+
+% Греческие символы прямым шрифтом.
+%\def\alpha{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{97}}}}
+%\def\beta{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{98}}}}
+%\def\chi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{99}}}}
+%\def\delta{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{100}}}}
+%\def\varepsilon{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{101}}}}
+%\def\phi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{102}}}}
+%\def\gamma{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{103}}}}
+%\def\eta{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{104}}}}
+%\def\iota{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{105}}}}
+%\def\varphi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{106}}}}
+%\def\kappa{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{107}}}}
+%\def\lambda{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{108}}}}
+%\def\mu{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{109}}}}
+%\def\nu{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{110}}}}
+%\def\omicron{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{111}}}}
+%\def\pi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{112}}}}
+%\def\theta{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{113}}}}
+%\def\rho{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{114}}}}
+%\def\sigma{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{115}}}}
+%\def\tau{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{116}}}}
+%\def\upsilon{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{117}}}}
+%\def\varpi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{118}}}}
+%\def\omega{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{119}}}}
+%\def\xi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{120}}}}
+%\def\psi{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{121}}}}
+%\def\zeta{{\text{\usefont{U}{psy}{m}{n}\selectfont\symbol{122}}}}
+%\def\epsilon{\varepsilon}
+%\DeclareMathSymbol{\int}{\mathop}{Symbol}{242}
+%\def\intup{\mbox{\usefont{U}{psy}{m}{n}\selectfont\symbol{243}}}
+%\def\intdn{\mbox{\usefont{U}{psy}{m}{n}\selectfont\symbol{245}}}
+%\def\int{\mathop{\intup\atop\intdn}}
+%\def\int{\mathop{\raisebox{-.7ex}{\usefont{U}{psy}{m}{n}\fontsize{16pt}{16pt}\selectfont\symbol{242}}}}
+%\def\oint{\mathop{\lefteqn{\circ}\raisebox{-1ex}{\usefont{U}{psy}{m}{n}\fontsize{16pt}{16pt}\selectfont\symbol{242}}}}

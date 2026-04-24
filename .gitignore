@@ -1,0 +1,10 @@
+/*
+
+!.gitignore
+!/images/
+!main.tex
+!style.tex
+!header.tex
+
+
+**/__pycache__/
