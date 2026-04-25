@@ -3,6 +3,9 @@
 !.gitignore
 !/images/
 !main.tex
+!preamble.tex
+!thesis-style.sty
+
 !style.tex
 !header.tex
 

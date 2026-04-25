@@ -1,112 +1,52 @@
 \documentclass[a4paper, oneside, 12pt]{report}
-% --- Russian support & typography ---
-\usepackage[utf8]{inputenc}
-\usepackage[T2A]{fontenc}
-\usepackage[russian]{babel}
-\usepackage{csquotes}
-\usepackage{indentfirst}
-\usepackage[protrusion=true, expansion=false]{microtype}
+\input{preamble.tex}
+\usepackage{thesis-style}
 
-% --- Page layout ---
-\usepackage{geometry}
-\geometry{
-  top=20mm, bottom=20mm,
-  left=30mm, right=15mm,
-  headheight=15pt
-}
-\usepackage{setspace}
-\onehalfspacing
-
-% --- Math & graphics ---
-\usepackage{amsmath, amssymb}
-\usepackage{graphicx}
-\graphicspath{{images/}}
-
-% --- Hyperlinks & bookmarks ---
-\usepackage{hyperref}
-\hypersetup{
-  colorlinks=true,
-  linkcolor=black,
-  urlcolor=blue,
-  citecolor=black,
-  pdftitle={Master's thesis},
-  pdfauthor={Roman Gorbunov}
-}
-
-% --- Bibliography (ГОСТ стиль) ---
-\usepackage[style=gost-numeric, sorting=none, backend=biber]{biblatex}
-\addbibresource{references.bib}
-
-% --- Title info ---
-\newcommand{\thesisTitle}{«Алгоритмы внутрисхемного измерения частотных характеристик и идентификации параметров вторичных источников электропитания»}
-\newcommand{\studentName}{Горбунов Роман Леонидович}
-\newcommand{\universityCity}{Санкт-Петербург}
-\newcommand{\releaseYear}{2026}
+% --- Set metadata ---
+\thesisTitle{«Алгоритмы внутрисхемного измерения частотных характеристик и идентификации параметров вторичных источников электропитания»}
+\studentName{Горбунов Роман Леонидович}
+\universityCity{Санкт-Петербург}
+\advisorName{к.ф.-м.н., Бабушкин М.В.}
+\releaseYear{2026}
 
 \begin{document}
 
-\begin{titlepage}
-  \begin{center}
-    \large \textbf{Университет ИТМО} \\[0.5cm]
-    \normalsize Факультет технологий искусственного интеллекта \\[0.5cm]
-    \large \textbf{МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ} \\[0.3cm]
-    \normalsize по направлению подготовки \\
-    \textbf{27.04.03 Системный анализ и управление} \\[1.5cm]
-    \large Тема: \textbf{\thesisTitle} \\[1.5cm]
-    \normalsize Выполнил: \studentName \\
-    Научный руководитель: к.ф.-м.н., Бабушкин М.В. \\[2cm]
-    \large \universityCity, \releaseYear
-  \end{center}
-\end{titlepage}
-\thispagestyle{empty}
+% Title page
+\makeThesisTitle
 
-% Annotation.
-\chapter*{Аннотация}
-\addcontentsline{toc}{chapter}{Аннотация}
+% Annotation
+\unnumberedChapter{Аннотация}
 Краткое описание работы (цель, методы, результаты, объём). \par
 \textbf{Ключевые слова:} ключ1, ключ2, ключ3.
 
-% Table of Contents.
+% Table of Contents
 \clearpage
 \tableofcontents
 \clearpage
 
-%\chapter{Введение}
+% --- Chapters ---
+\chapter{Введение}
 Текст введения. Актуальность, цель, задачи, научная новизна, практическая значимость.
 
-%\chapter{Обзор литературы и постановка задачи}
+\chapter{Обзор литературы и постановка задачи}
 Анализ существующих работ, формулировка проблемы и задач исследования.
 
-%\chapter{Методология и материалы}
+\chapter{Методология и материалы}
 Описание методов, оборудования, программного обеспечения, исходных данных.
 
-%\chapter{Результаты исследования}
+\chapter{Результаты исследования}
 Представление и анализ полученных данных, графики, таблицы.
 
-%\chapter{Заключение}
+\chapter{Заключение}
 Выводы по работе, перспективы дальнейших исследований.
 
-% Reference
-%\clearpage
-%\printbibliography[heading=bibintoc, title={Список использованных источников}]
+% Bibliography
+\clearpage
+\printbibliography[heading=bibintoc, title={Список использованных источников}]
 
-% ===== Приложения (опционально) =====
+% Appendices
 \appendix
-%\chapter{Дополнительные материалы}
+\chapter{Дополнительные материалы}
 Код, расчёты, сертификаты и т.д.
-
-
-%\include{style}  % Стилевой файл
-%\maketitle
-%\begin{abstract}                % аннотация
-    %A short summary.
-%\end{abstract}
-
-%\pagebreak
-
-dfkdfdfdfdf                     % some text
-%\tableofcontents
-%\include{sineSweep/main}
-%\include{Appendix/main}
 
 \end{document}

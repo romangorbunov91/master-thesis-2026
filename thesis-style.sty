@@ -1,0 +1,48 @@
+% thesis-style.sty
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis-style}[2026/04/25 ITMO Master's Thesis Style]
+
+% --- Metadata commands ---
+\newcommand{\thesisTitle}[1]{\gdef\@thesisTitle{#1}}
+\newcommand{\studentName}[1]{\gdef\@studentName{#1}}
+\newcommand{\advisorName}[1]{\gdef\@advisorName{#1}}
+\newcommand{\universityCity}[1]{\gdef\@universityCity{#1}}
+\newcommand{\releaseYear}[1]{\gdef\@releaseYear{#1}}
+
+% Default values (can be overridden in main.tex)
+\def\@thesisTitle{}
+\def\@studentName{}
+\def\@universityCity{}
+\def\@releaseYear{}
+\def\@advisorName{}
+
+% --- Custom Title Page ---
+\newcommand{\makeThesisTitle}{%
+  \begin{titlepage}
+    \begin{center}
+      \large \textbf{Университет ИТМО} \\[0.5cm]
+      \normalsize Факультет технологий искусственного интеллекта \\[0.5cm]
+      \large \textbf{МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ} \\[0.3cm]
+      \normalsize по направлению подготовки \\
+      \textbf{27.04.03 Системный анализ и управление} \\[1.5cm]
+      \large Тема: \textbf{\@thesisTitle} \\[1.5cm]
+
+      \normalsize
+      \begin{tabular}{@{}l@{}}      % Clean left-aligned block
+        Выполнил: \@studentName \\
+        Научный руководитель: \@advisorName
+      \end{tabular} \\[2cm]
+
+      \vfill
+      \large \@universityCity, \@releaseYear
+    \end{center}
+  \end{titlepage}%
+  \thispagestyle{empty}%
+}
+
+% --- Helper: unnumbered chapter with TOC entry ---
+\newcommand{\unnumberedChapter}[2][chapter]{%
+  \chapter*{#2}%
+  \addcontentsline{toc}{#1}{#2}%
+}
+\endinput
