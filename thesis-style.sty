@@ -3,6 +3,7 @@
 \ProvidesPackage{thesis-style}[2026/04/25 ITMO Master's Thesis Style]
 
 % --- Metadata commands ---
+\newcommand{\universityName}[1]{\gdef\@universityName{#1}}
 \newcommand{\thesisTitle}[1]{\gdef\@thesisTitle{#1}}
 \newcommand{\studentName}[1]{\gdef\@studentName{#1}}
 \newcommand{\advisorName}[1]{\gdef\@advisorName{#1}}
@@ -10,6 +11,7 @@
 \newcommand{\releaseYear}[1]{\gdef\@releaseYear{#1}}
 
 % Default values (can be overridden in main.tex)
+\def\@universityName{}
 \def\@thesisTitle{}
 \def\@studentName{}
 \def\@universityCity{}
@@ -22,19 +24,19 @@
     \singlespacing
     \centering
     
-    \large \textbf{Университет ИТМО} \\%[0.5cm]
-    \normalsize Факультет технологий искусственного интеллекта \\[10.0cm]
+    \large \textbf{\@universityName} \\[0.5cm]
+    \normalsize Факультет технологий искусственного интеллекта \\[8.0cm]
     
     \large \textbf{МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ} \\[0.0cm]
     \normalsize по направлению подготовки \\
     \textbf{27.04.03 Системный анализ и управление} \\[1.5cm]
-    \large Тема: \textbf{\@thesisTitle} \\[1.5cm]
+    \large Тема: \textbf{\@thesisTitle} \\[3.0cm]
 
     \normalsize
-    \begin{flushright}
+    \begin{tabular}{l@{\hspace{-10.5em}}l}
       Выполнил: \@studentName \\
       Научный руководитель: \@advisorName
-    \end{flushright}
+    \end{tabular}
 
     \vfill
     \large \@universityCity, \@releaseYear
@@ -47,4 +49,18 @@
   \chapter*{#2}%
   \addcontentsline{toc}{#1}{#2}%
 }
+
+% --- Chapter spacing & formatting ---
+\titlespacing*{\chapter}
+  {0pt}   % left
+  {25pt}  % top (reduce to shrink gap)
+  {20pt}  % bottom
+
+% Optional: center & style chapter titles
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\centering}
+  {\chaptertitlename\ \thechapter}
+  {10pt}
+  {\Huge\bfseries}
+
 \endinput

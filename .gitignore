@@ -2,6 +2,7 @@
 
 !.gitignore
 !/images/
+!/chapters/
 !main.tex
 !preamble.tex
 !thesis-style.sty
