@@ -4,6 +4,9 @@
 
 % --- Set metadata ---
 \universityName{Университет ИТМО}
+\universityFaculty{Факультет технологий искусственного интеллекта}
+\documentName{МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ}
+\studyProgramm{27.04.03 Системный анализ и управление}
 \thesisTitle{«Алгоритмы внутрисхемного измерения частотных характеристик и идентификации параметров вторичных источников электропитания»}
 \studentName{Горбунов Роман Леонидович}
 \universityCity{Санкт-Петербург}
@@ -17,7 +20,7 @@
 
 % Annotation
 \unnumberedChapter{Аннотация}
-Краткое описание работы (цель, методы, результаты, объём). \par
+Краткое описание работы. \par
 \textbf{Ключевые слова:} ключ1, ключ2, ключ3.
 
 % Table of Contents
@@ -27,8 +30,11 @@
 
 % Chapters
 \include{chapters/introduction.tex}
-\include{chapters/review.tex}
+\include{chapters/review/main_review.tex}
+\include{chapters/frequencyResponse/main_frequencyResponse.tex}
+\include{chapters/parametersEstimation/main_parametersEstimation.tex}
 \include{chapters/conclusion.tex}
+\cite{somekey}
 
 % Bibliography
 \clearpage

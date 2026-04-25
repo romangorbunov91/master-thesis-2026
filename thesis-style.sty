@@ -4,6 +4,9 @@
 
 % --- Metadata commands ---
 \newcommand{\universityName}[1]{\gdef\@universityName{#1}}
+\newcommand{\universityFaculty}[1]{\gdef\@universityFaculty{#1}}
+\newcommand{\studyProgramm}[1]{\gdef\@studyProgramm{#1}}
+\newcommand{\documentName}[1]{\gdef\@documentName{#1}}
 \newcommand{\thesisTitle}[1]{\gdef\@thesisTitle{#1}}
 \newcommand{\studentName}[1]{\gdef\@studentName{#1}}
 \newcommand{\advisorName}[1]{\gdef\@advisorName{#1}}
@@ -12,6 +15,9 @@
 
 % Default values (can be overridden in main.tex)
 \def\@universityName{}
+\def\@universityFaculty{}
+\def\@studyProgramm{}
+\def\@documentName{}
 \def\@thesisTitle{}
 \def\@studentName{}
 \def\@universityCity{}
@@ -25,17 +31,17 @@
     \centering
     
     \large \textbf{\@universityName} \\[0.5cm]
-    \normalsize Факультет технологий искусственного интеллекта \\[8.0cm]
+    \normalsize \@universityFaculty \\[8.0cm]
     
-    \large \textbf{МАГИСТЕРСКАЯ ДИССЕРТАЦИЯ} \\[0.0cm]
+    \large \textbf{\@documentName} \\[0.0cm]
     \normalsize по направлению подготовки \\
-    \textbf{27.04.03 Системный анализ и управление} \\[1.5cm]
+    \textbf{\@studyProgramm} \\[1.5cm]
     \large Тема: \textbf{\@thesisTitle} \\[3.0cm]
 
     \normalsize
     \begin{tabular}{l@{\hspace{-10.5em}}l}
-      Выполнил: \@studentName \\
-      Научный руководитель: \@advisorName
+      \textbf{Выполнил:} \@studentName \\
+      \textbf{Научный руководитель:} \@advisorName
     \end{tabular}
 
     \vfill
@@ -53,14 +59,13 @@
 % --- Chapter spacing & formatting ---
 \titlespacing*{\chapter}
   {0pt}   % left
-  {25pt}  % top (reduce to shrink gap)
+  {0pt}  % top (reduce to shrink gap)
   {20pt}  % bottom
 
-% Optional: center & style chapter titles
 \titleformat{\chapter}[display]
-  {\normalfont\Large\bfseries\centering}
-  {\chaptertitlename\ \thechapter}
-  {10pt}
-  {\Huge\bfseries}
+  {\normalfont\centering}          % <format>: overall wrapper style
+  {}                               % <label>: empty → removes separate label block
+  {0pt}                            % <sep>: ignored when label is empty
+  {\Huge\bfseries\thechapter\quad} % <before-code>: number + spacing + title text
 
 \endinput

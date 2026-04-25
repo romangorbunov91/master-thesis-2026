@@ -6,7 +6,10 @@
 \usepackage{indentfirst}
 \usepackage[protrusion=true, expansion=false]{microtype}
 \usepackage{titlesec}
+\usepackage{lipsum}
+
 \usepackage{comment}
+
 % --- Page layout & spacing ---
 \usepackage{geometry}
 \geometry{
@@ -14,6 +17,33 @@
   left=30mm, right=15mm,
   headheight=15pt
 }
+
+\renewcommand{\unnumberedChapter}[1]{%
+  \chapter*{#1}%
+  \addcontentsline{toc}{chapter}{#1}%
+}
+
+% ─── Chapter: 16pt, centered, numbered inline ───
+\titleformat{\chapter}[display]
+  {\normalfont\centering\bfseries}          % <format>
+  {}                                        % <label> (empty → removes separate block)
+  {0pt}                                     % <sep>
+  {\fontsize{16pt}{20pt}\selectfont\thechapter\quad} % <before-code>
+
+% ─── Unnumbered chapters (\chapter*{...}) ───
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\centering\bfseries}
+  {}
+  {0pt}
+  {\fontsize{16pt}{20pt}\selectfont}
+
+% ─── Section: 14pt, left-aligned, numbered ───
+\titleformat{\section}
+  {\normalfont\bfseries}
+  {\thesection}
+  {1em}
+  {\fontsize{14pt}{17pt}\selectfont}
+
 \usepackage{setspace}
 \onehalfspacing
 
@@ -29,7 +59,7 @@
   linkcolor=black,
   urlcolor=blue,
   citecolor=black,
-  pdftitle={Master's thesis},
+  pdftitle={Master thesis},
   pdfauthor={Roman Gorbunov}
 }
 
