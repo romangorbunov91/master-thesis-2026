@@ -2,6 +2,7 @@
 
 !.gitignore
 !images/
+!chapters/
 !main.tex
 !preamble.tex
 !thesis-style.sty
@@ -9,10 +10,10 @@
 !style.tex
 !header.tex
 
-# In 'chapters/', ignore everything EXCEPT .tex files (recursively).
-chapters/*
-!chapters/**/*.tex
+# Recursively ignore everything in chapters/, then un-ignore .tex
+chapters/**/*
 !chapters/**/
+!chapters/**/*.tex
 
 # Ignore Python cache directories everywhere.
 **/__pycache__/
