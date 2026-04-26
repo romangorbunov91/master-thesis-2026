@@ -1,14 +1,48 @@
 % --- Russian support & typography ---
-\usepackage[utf8]{inputenc}
-\usepackage[T2A]{fontenc}
-\usepackage[russian]{babel}
+\usepackage[T2A]{fontenc}      % Cyrillic font encoding
+\usepackage[utf8]{inputenc}    % UTF-8 source input
+\usepackage{cmap}              % Makes Cyrillic text searchable/copyable in PDF
+\usepackage[russian]{babel}    % Russian hyphenation & captions
+
 \usepackage{csquotes}
 \usepackage{indentfirst}
 \usepackage[protrusion=true, expansion=false]{microtype}
+\usepackage{float}
 \usepackage{titlesec}
-\usepackage{lipsum}
+\usepackage{tocloft}
+% Removes bold (makes normal weight) from chapter titles in ToC.
+\renewcommand{\cftchapfont}{\normalfont}
+% Removes bold from chapter page numbers.
+\renewcommand{\cftchappagefont}{\normalfont}
+% Enables dots for all chapters in TOC.
+\renewcommand{\cftchapdotsep}{\cftdotsep}  
+% Forces identical baseline & style.
+\renewcommand{\cftchapleader}{\normalfont\cftdotfill{\cftdotsep}}
+% Chapter → Chapter/Section gap.
+\setlength{\cftbeforechapskip}{0pt}
+% Section → Section gap.
+\setlength{\cftbeforesecskip}{0pt}
+% Subsection → Subsection gap.
+\setlength{\cftbeforesubsecskip}{0pt}
 
 \usepackage{comment}
+
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{enumitem}
+\setlist[itemize]{
+  itemsep=0.0em, parsep=0pt,
+  topsep=0pt, partopsep=0pt
+}
+\setlist[enumerate]{
+  itemsep=0.0em, parsep=0pt,
+  topsep=0pt, partopsep=0pt
+}
+
+\usepackage{caption}
+\captionsetup[figure]{name=Рисунок, labelsep=period}
+\captionsetup[table]{name=Таблица, labelsep=period}
 
 % --- Page layout & spacing ---
 \usepackage{geometry}
@@ -16,11 +50,6 @@
   top=20mm, bottom=20mm,
   left=30mm, right=15mm,
   headheight=15pt
-}
-
-\renewcommand{\unnumberedChapter}[1]{%
-  \chapter*{#1}%
-  \addcontentsline{toc}{chapter}{#1}%
 }
 
 % ─── Chapter: 16pt, centered, numbered inline ───
@@ -44,11 +73,12 @@
   {1em}
   {\fontsize{14pt}{17pt}\selectfont}
 
-\usepackage{setspace}
-\onehalfspacing
-
 % --- Math & graphics ---
-\usepackage{amsmath, amssymb}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{svg}
 \usepackage{graphicx}
 \graphicspath{{images/}}
 

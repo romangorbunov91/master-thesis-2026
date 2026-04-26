@@ -1,4 +1,4 @@
-\subsection{Алгоритм ${T_{h} - var}$, ${N=const}$}\label{sec: N_const}
+\section{Алгоритм ${T_{h} - var}$, ${N=const}$}\label{sec: N_const}
 
 Данный алгоритм характеризуется тем, что в серии из $K$ изменений периода ${T_{z}}$ инжектируемого сигнала (${T^{(k)}_{z}}$, ${k \in \left[1;K\right]}$):
 \begin{itemize}
@@ -26,8 +26,8 @@
 Дискретные последовательности ${x^{(k)}[n]}$, ${y^{(k)}[n]}$ формируются по правилу \eqref{eqn: sampleRule} фактически с эквивалентным периодом дискретизации ${T^{(k)}_{s} = M^{(k)} \cdot T_d}$ (рис.~\eqref{fig: N_const}). Под эквивалентным понимается такой период дискретизации, при котором формировалась бы точно такая же дискретная последовательность.
 
 \begin{figure}[H]
-    \center
-    \includegraphics [scale=1.00] {fig/N_const}
+    \centering
+    \includegraphics [width=0.85\linewidth] {frequencyResponse/N_const.drawio.png}
 
     \caption{Период дискретизации ${T^{(k)}_{s}}$ при изменении периода ${T^{(z)}_{s}}$ инжектируемого сигнала}
     \label{fig: N_const}
