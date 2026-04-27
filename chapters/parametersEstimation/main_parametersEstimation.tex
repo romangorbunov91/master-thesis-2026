@@ -3,10 +3,126 @@
 
 \section{Препроцессинг}
 
+Входные данные измеряются в очень широком диапазоне от -60 дБ до +60 дБ. Это 6 порядков. Типовые нормировки вида norm/std, min/max делают очень мелкими участки данных, модель к таким мелким изменениям нечувствительна. Более того, большую роль играют участки положительных и отрицательных значений. В общем, ломаются важные характерные особенности данных.
+
+Принято решение перейти к наклонам и участкам выпуклости.
+
 \section{Архитектура модели}
 
-В основу модели положен автоэнкодер.
-На вход модели подается 1D-массив размерностью $[B, C_{in}, Lenght]$. На выходе формируется бинарная маска, состоящая из $C_{out}$-каналов, каждый из которых соответствует одному из объектов к идентификации.
+Решаемая задача по идентификации параметров сведена к задаче instance-сегментации. В основу положен автоэнкодер на вход которого подается частотная характеристика объекта, а на выходе формируется многоканальная бинарная маска. Количество каналов маски соответствует количеству идентифицируемых обектов.
+
+\subsection{Энкодер}
+В созданной реализации энкодер построен на сверточных блоках с residual-связями. При декодировании используются skip-связи, оснащенные attention-gates. Энкодер и декодер связаны посредством Bottleneck на основе трансформера.
+
+На вход подаётся одномерный тензор ${\mathbf{x} \in \mathbb{R}^{B \times C_{\text{in}} \times L}}$,
+где ${B}$ - размер батча, ${C_{\text{in}}}$ - количество каналов на входе, ${L}$ - длина тензора.
+
+В базовом блоке энкодера последовательно выполняются две свертки (nn.Conv1d) с ядрами ${W_1}$, ${W_2}$. После каждой свертки данные нормализуются (nn.GroupNorm). После второй свертки реализован Dropout (nn.Dropout).
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{z}_1 &= \sigma\left(\mathcal{N}\left(\mathbf{W}_1 \ast \mathbf{x}\right)\right) \\
+        \mathbf{z}_2 &= \text{Dropout}\left(\sigma\left(\mathcal{N}\left(\mathbf{W}_2 \ast \mathbf{z}_1\right)\right)\right) \\
+        \mathbf{s} &= 
+        \begin{cases} 
+        \mathbf{W}_s \ast \mathbf{x} & \text{if } C_{in} \neq C_{out} \\
+        \mathbf{x} & \text{otherwise}
+        \end{cases} \\
+        \mathbf{y} &= \sigma\left(\mathbf{z}_2 \oplus \mathbf{s}\right)
+    \end{aligned}
+\end{equation*}
+где
+${\ast}$ - оператор свертки.
+
+${\sigma(\cdot)}$ - функция активации (использована nn.GELU).
+
+${\mathcal{N}(\cdot)}$ - нормализация (nn.GroupNorm).
+
+${\oplus}$ - поэлементная сумма.
+
+${\odot}$ - поэлементное умножение.
+
+${\text{cat}(\cdot,\cdot)}$ - слияние по каналам.
+
+${\downarrow_s}$ - Downsampling by factor $s$ (e.g., MaxPool).
+
+${\uparrow_s}$ - Upsampling by factor $s$ (linear interpolation).
+
+${\mathbf{t}}$ - Ground truth target tensor.
+
+${\mathcal{L}}$ - функция потерь (ошибки).
+
+\subsection{Attention-Gated Skip Connections}
+
+Фичи энекодера перед слиянием с фичами декодера взвешиваются. По аналогии с \cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
+
+Допустим, из skip-connection выходит
+
+${\mathbf{x} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{x}}}}$.
+
+Выход декодера
+
+${\mathbf{g} \in \mathbb{R}^{B \times F_{\text{g}} \times L_{\text{g}}}}$.
+
+Выход энкодера сначала согласуется по размерности - приводится к размерности декодера.
+
+${\mathbf{x}' = \text{Interpolate}(\mathbf{x}, \text{size}=L_{\text{g}})}$.
+
+Затем фичи через матрицы весовых коэффициентов ${W_{\text{g}}}$, ${W_{\text{x}}}$ согласуются по числу фичей (приводятся к ${F_\text{int}}$)
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{q} &= \mathcal{N}\left(\mathbf{W}_g \ast \mathbf{g}\right), \quad 
+        \mathbf{k} &= \mathcal{N}\left(\mathbf{W}_x \ast \mathbf{x}'\right)
+    \end{aligned}
+\end{equation*}
+где
+
+${\mathbf{q}, \mathbf{k} \in \mathbb{R}^{B \times F_{\text{int}} \times L_{\text{g}}}}$.
+
+Суммируются и проходят через функцию активации.
+
+${\mathbf{a} = \sigma_{\text{ReLU}}\left(\mathbf{q} \oplus \mathbf{k}\right)}$.
+
+
+Преобразуются к одному каналу
+${\boldsymbol{\psi} = \sigma_{\text{Sigmoid}}\left(\mathcal{N}\left(\mathbf{W}_{\psi} \ast \mathbf{a}\right)\right)}$
+
+${\boldsymbol{\psi} \in \mathbb{R}^{B \times 1 \times L_{\text{g}}}}$.
+    
+В декодер поступает 
+
+${\mathbf{y} = \mathbf{x}' \odot \boldsymbol{\psi}}$
+
+${\mathbf{y} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{g}}}}$
+
+
+\subsection{TransformerBottleneck: Global Context Modeling}
+
+\begin{equation*}
+    \begin{aligned}
+        &\textbf{MHSA Block:} \\
+        \mathbf{\hat{X}} &= \mathcal{N}_1(\mathbf{X}) \\
+        \text{Head}_i &= \text{Softmax}\left(\frac{(\mathbf{\hat{X}}\mathbf{W}_i^Q)(\mathbf{\hat{X}}\mathbf{W}_i^K)^\top}{\sqrt{d_k}}\right)(\mathbf{\hat{X}}\mathbf{W}_i^V) \\
+        \text{MHSA}(\mathbf{\hat{X}}) &= \text{Concat}(\text{Head}_1, \dots, \text{Head}_h)\mathbf{W}^O \\
+        \mathbf{X}' &= \mathbf{X} \oplus \text{MHSA}(\mathbf{\hat{X}}) \\
+        \\
+        &\textbf{MLP Block:} \\
+        \mathbf{\tilde{X}} &= \mathcal{N}_2(\mathbf{X}') \\
+        \text{MLP}(\mathbf{\tilde{X}}) &= \text{Drop}\left(\mathbf{W}_2 \cdot \sigma_{\text{GELU}}\left(\mathbf{W}_1 \mathbf{\tilde{X}}\right)\right) \\
+        \mathbf{Y} &= \mathbf{X}' \oplus \text{MLP}(\mathbf{\tilde{X}})
+    \end{aligned}
+\end{equation*}
+
+\subsection{Декодер}
+
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{x}_{\uparrow} &= \text{Upsample}(\mathbf{x}, \text{scale}=s, \text{mode=linear}) \\
+        \mathbf{z} &= \mathbf{W} \ast \mathbf{x}_{\uparrow} \\
+        \mathbf{y} &= \sigma\left(\mathcal{N}(\mathbf{z})\right)
+    \end{aligned}
+\end{equation*}
+
 
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Conv}{\ast}
@@ -21,6 +137,8 @@
 \newcommand{\Interp}{\operatorname{Interp}}
 \newcommand{\Dropout}{\operatorname{Dropout}}
 \newcommand{\Concat}{\operatorname{Concat}}
+
+
 
 
 \section*{Notation}
@@ -166,3 +284,15 @@ For input $\mathbf{x} \in \R^{B \times C \times L}$:
 
 \section{Обучение и результирующие метрики}
 
+Обучение производилось по комбинированной функции потерь:
+
+
+BCE loss:
+
+
+Dice дифференцируемый:
+
+
+\begin{equation*}
+    \mathcal{L} = \mathcal{L}_{\text{main}}(\mathbf{y}_{\text{main}}, \mathbf{t}) + \lambda \sum_{k=0}^{3} \mathcal{L}_{\text{ds}}^{(k)}(\mathbf{y}_{\text{ds}}^{(k)}, \mathbf{t}_{\downarrow^k})
+\end{equation*}
