@@ -54,7 +54,7 @@ ${\mathcal{L}}$ - функция потерь (ошибки).
 
 \subsection{Attention-Gated Skip Connections}
 
-Фичи энекодера перед слиянием с фичами декодера взвешиваются. По аналогии с \cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
+Фичи энекодера перед слиянием с фичами декодера взвешиваются. По аналогии с %\cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
 
 Допустим, из skip-connection выходит
 
@@ -143,8 +143,10 @@ Residual connection:
 \end{equation*}
 
 \begin{equation*}
-    W_1 & \in \mathbb{R}^{(rC) \times C}, \\
-    W_2 & \in \mathbb{R}^{C \times (rC)}.
+    \begin{aligned}
+        W_1 & \in \mathbb{R}^{(rC) \times C}, \\
+        W_2 & \in \mathbb{R}^{C \times (rC)}.
+    \end{aligned}
 \end{equation*}
 где $r$ - mlp-ratio.
 
