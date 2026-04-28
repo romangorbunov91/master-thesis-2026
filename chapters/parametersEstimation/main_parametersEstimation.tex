@@ -79,6 +79,12 @@ ${\mathbf{x}' = \text{Interpolate}(\mathbf{x}, \text{size}=L_{\text{g}})}$.
 
 ${\mathbf{q}, \mathbf{k} \in \mathbb{R}^{B \times F_{\text{int}} \times L_{\text{g}}}}$.
 
+\begin{equation*}
+    W_g \in \mathbb{R}^{F_{\text{int}} \times F_g \times 1}, \quad
+    W_x \in \mathbb{R}^{F_{\text{int}} \times F_l \times 1}, \quad
+    W_\psi \in \mathbb{R}^{1 \times F_{\text{int}} \times 1}
+\end{equation*}
+
 Суммируются и проходят через функцию активации.
 
 ${\mathbf{a} = \sigma_{\text{ReLU}}\left(\mathbf{q} \oplus \mathbf{k}\right)}$.
@@ -97,20 +103,54 @@ ${\mathbf{y} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{g}}}}$
 
 
 \subsection{TransformerBottleneck: Global Context Modeling}
+Bottleneck реализован на алгоритме Multi-Head Self-Attention (MHSA). Входной тензор преобразован к размерности
+
+${\mathbf{x} \in \mathbb{R}^{B \times L \times C}}$
+
+и нормализован
+
+$\mathbf{\hat{x}} = \mathcal{N}_1(\mathbf{x})$.
+
+Вычисляются h-голов; для каждой головы ${i \in \{1, \dots, h\}}$: 
 
 \begin{equation*}
     \begin{aligned}
-        &\textbf{MHSA Block:} \\
-        \mathbf{\hat{X}} &= \mathcal{N}_1(\mathbf{X}) \\
-        \text{Head}_i &= \text{Softmax}\left(\frac{(\mathbf{\hat{X}}\mathbf{W}_i^Q)(\mathbf{\hat{X}}\mathbf{W}_i^K)^\top}{\sqrt{d_k}}\right)(\mathbf{\hat{X}}\mathbf{W}_i^V) \\
-        \text{MHSA}(\mathbf{\hat{X}}) &= \text{Concat}(\text{Head}_1, \dots, \text{Head}_h)\mathbf{W}^O \\
-        \mathbf{X}' &= \mathbf{X} \oplus \text{MHSA}(\mathbf{\hat{X}}) \\
-        \\
-        &\textbf{MLP Block:} \\
-        \mathbf{\tilde{X}} &= \mathcal{N}_2(\mathbf{X}') \\
-        \text{MLP}(\mathbf{\tilde{X}}) &= \text{Drop}\left(\mathbf{W}_2 \cdot \sigma_{\text{GELU}}\left(\mathbf{W}_1 \mathbf{\tilde{X}}\right)\right) \\
-        \mathbf{Y} &= \mathbf{X}' \oplus \text{MLP}(\mathbf{\tilde{X}})
+        Q_i &= X W_i^Q \in \mathbb{R}^{B \times L \times d_k} \\
+        K_i &= X W_i^K \in \mathbb{R}^{B \times L \times d_k} \\
+        V_i &= X W_i^V \in \mathbb{R}^{B \times L \times d_k} \\
+        \text{Head}_i &= \text{Softmax}\left(\frac{Q_i K_i^\top}{\sqrt{d_k}}\right) V_i
     \end{aligned}
+\end{equation*}
+
+\begin{equation*}
+    W_i^Q, W_i^K, W_i^V \in \mathbb{R}^{C \times d_{k}}
+\end{equation*}
+где ${d_{k}=C/h}$.
+
+Слияние результатов вычислений:
+\begin{equation*}
+    \text{MHSA}(\mathbf{\hat{X}}) = \text{Concat}(\text{Head}_1, \dots, \text{Head}_h)\mathbf{W}^O
+\end{equation*}
+
+Residual connection:
+\begin{equation*}
+    \mathbf{x}' = \mathbf{x} \oplus \text{MHSA}(\mathbf{\hat{x}}).
+\end{equation*}
+
+Нормализация и MLP:
+\begin{equation*}
+    \text{MLP}(\mathbf{\tilde{X}}) = \text{Drop}\left(\mathbf{W}_2 \cdot \sigma_{\text{GELU}}\left(\mathbf{W}_1 \mathcal{N}_2(\mathbf{X}')\right)\right).
+\end{equation*}
+
+\begin{equation*}
+    W_1 & \in \mathbb{R}^{(rC) \times C}, \\
+    W_2 & \in \mathbb{R}^{C \times (rC)}.
+\end{equation*}
+где $r$ - mlp-ratio.
+
+Residual connection:
+\begin{equation*}
+    \mathbf{y} = \mathbf{x}' \oplus \text{MLP}(\mathbf{\tilde{x}})
 \end{equation*}
 
 \subsection{Декодер}
