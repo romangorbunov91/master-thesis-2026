@@ -1,51 +1,63 @@
 \section{Архитектура модели}
 
-Решаемая задача по идентификации параметров сведена к задаче instance-сегментации. Фактически детектируются области частот, в которых расположены искомые объекты. В основу положен автоэнкодер на вход которого подается частотная характеристика объекта, а на выходе формируется многоканальная бинарная маска. Количество каналов маски соответствует количеству детектируемых объектов.
+Модель основана на автоэнкодере, структурно состоящем из следующих основных блоков:
+\begin{itemize}
+    \item CNN-энкодер с residual-связями;
+    \item bottleneck на основе алгоритма attention;
+    \item ???-декодер;
+    \item attention gated skip connections.
+\end{itemize}
+
+На вход автоэнкодера подается многоканальный тензор длиной ${L}$:
+\begin{equation*}
+    {\mathbf{x}_{\text{in}} \in \mathbb{R}^{C_{\text{in}} \times L}},
+\end{equation*}
+где ${C_{\text{in}}}$ -- количество каналов.
+
+На выходе формируется многоканальная бинарная маска.
+
+\begin{equation*}
+    {\mathbf{x}_{\text{out}} \in \mathbb{R}^{C_{\text{out}} \times L}}.
+\end{equation*}
+
+Количество каналов маски ${C_{\text{out}}}$ соответствует количеству детектируемых объектов.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=0.85\linewidth] {parametersEstimation/model_block_diagram.drawio.png}
+
+	\caption{Блок-схема архитектуры модели}
+	\label{fig: model_block_diagram}
+\end{figure}
 
 \subsection{Энкодер}
-В созданной реализации энкодер построен на сверточных блоках с residual-связями. При декодировании используются skip-связи, оснащенные attention-gates. Энкодер и декодер связаны посредством Bottleneck на основе трансформера.
-
-На вход подаётся одномерный тензор ${\mathbf{x} \in \mathbb{R}^{B \times C_{\text{in}} \times L}}$,
-где ${B}$ -- размер батча, ${C_{\text{in}}}$ -- количество каналов на входе, ${L}$ -- длина тензора.
-
-В базовом блоке энкодера последовательно выполняются две свертки (nn.Conv1d) с ядрами ${W_1}$, ${W_2}$. После каждой свертки данные нормализуются (nn.GroupNorm). После второй свертки реализован Dropout (nn.Dropout).
+В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. В каждом базовом блоке $n$, ${n \in \{1, \dots, N\}}$, последовательно выполняются две свертки (${\ast}$, nn.Conv1d) с ядрами ${W_n^1}$, ${W_n^2}$, соответственно. Тензоры на выходе каждого сверточного слоя нормализуются (${\mathcal{N}(\cdot)}$, nn.GroupNorm) и проходят через функцию активации (${\sigma(\cdot)}$, nn.GELU). Регуляризация выполняется алгоритмом Dropout (nn.Dropout1d) на выходе второй свертки.
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{z}_1 &= \sigma\left(\mathcal{N}\left(\mathbf{W}_1 \ast \mathbf{x}\right)\right) \\
-        \mathbf{z}_2 &= \text{Dropout}\left(\sigma\left(\mathcal{N}\left(\mathbf{W}_2 \ast \mathbf{z}_1\right)\right)\right) \\
-        \mathbf{s} &= 
-        \begin{cases} 
-        \mathbf{W}_s \ast \mathbf{x} & \text{if } C_{in} \neq C_{out} \\
-        \mathbf{x} & \text{otherwise}
-        \end{cases} \\
-        \mathbf{y} &= \sigma\left(\mathbf{z}_2 \oplus \mathbf{s}\right)
+        \mathbf{z}_n^1 &= \sigma\left(\mathcal{N}\left(\mathbf{W}_n^1 \ast \mathbf{x}_{n-1}\right)\right) \\
+        \mathbf{z}_n^2 &= \text{Dropout}\left(\sigma\left(\mathcal{N}\left(\mathbf{W}_n^2 \ast \mathbf{z}_n^1\right)\right)\right).
     \end{aligned}
 \end{equation*}
-где
-${\ast}$ - оператор свертки.
 
-${\sigma(\cdot)}$ - функция активации (использована nn.GELU).
+Между базовыми блоками проброшены residual-связи для более глубокой обучаемости слоев энкодера.
 
-${\mathcal{N}(\cdot)}$ - нормализация (nn.GroupNorm).
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{r_n} &= 
+        \begin{cases} 
+            \mathbf{W}_n^r \ast \mathbf{x}_{n-1}, & \text{если} C_{in} \neq C_{out} \\
+            \mathbf{x}_{n-1}, & \text{иначе}
+        \end{cases} \\
+        \mathbf{x}_{n} &= \sigma\left(\mathbf{z}_n^2 \oplus \mathbf{r_n}\right)
+    \end{aligned}
+\end{equation*}
+где ${\oplus}$ -- поэлементная сумма.
 
-${\oplus}$ - поэлементная сумма.
-
-${\odot}$ - поэлементное умножение.
-
-${\text{cat}(\cdot,\cdot)}$ - слияние по каналам.
-
-${\downarrow_s}$ - Downsampling by factor $s$ (e.g., MaxPool).
-
-${\uparrow_s}$ - Upsampling by factor $s$ (linear interpolation).
-
-${\mathbf{t}}$ - Ground truth target tensor.
-
-${\mathcal{L}}$ - функция потерь (ошибки).
 
 \subsection{Attention-Gated Skip Connections}
 
-Фичи энекодера перед слиянием с фичами декодера взвешиваются. По аналогии с %\cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
+Фичи энкодера перед слиянием с фичами декодера взвешиваются. По аналогии с %\cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
 
 Допустим, из skip-connection выходит
 
@@ -93,7 +105,7 @@ ${\mathbf{y} = \mathbf{x}' \odot \boldsymbol{\psi}}$
 ${\mathbf{y} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{g}}}}$
 
 
-\subsection{TransformerBottleneck: Global Context Modeling}
+\subsection{Bottleneck}
 Bottleneck реализован на алгоритме Multi-Head Self-Attention (MHSA). Входной тензор преобразован к размерности
 
 ${\mathbf{x} \in \mathbb{R}^{B \times L \times C}}$
@@ -102,19 +114,19 @@ ${\mathbf{x} \in \mathbb{R}^{B \times L \times C}}$
 
 $\mathbf{\hat{x}} = \mathcal{N}_1(\mathbf{x})$.
 
-Вычисляются h-голов; для каждой головы ${i \in \{1, \dots, h\}}$: 
+Вычисляются h-голов; для каждой головы ${m \in \{1, \dots, h\}}$: 
 
 \begin{equation*}
     \begin{aligned}
-        Q_i &= X W_i^Q \in \mathbb{R}^{B \times L \times d_k} \\
-        K_i &= X W_i^K \in \mathbb{R}^{B \times L \times d_k} \\
-        V_i &= X W_i^V \in \mathbb{R}^{B \times L \times d_k} \\
-        \text{Head}_i &= \text{Softmax}\left(\frac{Q_i K_i^\top}{\sqrt{d_k}}\right) V_i
+        Q_m &= X W_m^Q \in \mathbb{R}^{L \times d_k} \\
+        K_m &= X W_m^K \in \mathbb{R}^{L \times d_k} \\
+        V_m &= X W_m^V \in \mathbb{R}^{L \times d_k} \\
+        \text{Head}_m &= \text{Softmax}\left(\frac{Q_m K_m^\top}{\sqrt{d_k}}\right) V_m
     \end{aligned}
 \end{equation*}
 
 \begin{equation*}
-    W_i^Q, W_i^K, W_i^V \in \mathbb{R}^{C \times d_{k}}
+    W_m^Q, W_m^K, W_m^V \in \mathbb{R}^{C \times d_{k}}
 \end{equation*}
 где ${d_{k}=C/h}$.
 
@@ -176,3 +188,12 @@ Residual connection:
         \mathbf{y}_{\text{ds}}^{(k)} &= \mathbf{W}_{\text{ds}}^{(k)} \ast \mathbf{d}_{k+1} \quad \text{(training only)}
     \end{aligned}
 \end{equation*}
+
+
+${\odot}$ - поэлементное умножение.
+
+${\text{cat}(\cdot,\cdot)}$ - слияние по каналам.
+
+${\downarrow_s}$ - Downsampling by factor $s$ (e.g., MaxPool).
+
+${\uparrow_s}$ - Upsampling by factor $s$ (linear interpolation).
