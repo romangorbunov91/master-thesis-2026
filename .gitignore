@@ -10,6 +10,8 @@
 !style.tex
 !header.tex
 
+!main.pdf
+
 # Recursively ignore everything in chapters/, then un-ignore .tex
 chapters/**/*
 !chapters/**/
