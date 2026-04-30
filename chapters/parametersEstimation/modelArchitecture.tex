@@ -5,7 +5,8 @@
     \item CNN-энкодер с residual-связями;
     \item bottleneck на основе алгоритма attention;
     \item ???-декодер;
-    \item attention gated skip connections.
+    \item attention gated-skip-связи между энкодером и декодером;
+    \item финальный слой.
 \end{itemize}
 
 На вход автоэнкодера подается многоканальный тензор длиной ${L}$:
@@ -31,7 +32,9 @@
 \end{figure}
 
 \subsection{Энкодер}
-В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. В каждом базовом блоке $n$, ${n \in \{1, \dots, N\}}$, последовательно выполняются две свертки (${\ast}$, nn.Conv1d) с ядрами ${W_n^1}$, ${W_n^2}$, соответственно. Тензоры на выходе каждого сверточного слоя нормализуются (${\mathcal{N}(\cdot)}$, nn.GroupNorm) и проходят через функцию активации (${\sigma(\cdot)}$, nn.GELU). Регуляризация выполняется алгоритмом Dropout (nn.Dropout1d) на выходе второй свертки.
+Энкодер преобразует входные данные в скрытое пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки (${\ast}$, nn.Conv1d) с ядрами ${W_n^1}$, ${W_n^2}$, соответственно.
+
+Тензоры на выходе каждого сверточного слоя нормализуются (${\mathcal{N}(\cdot)}$, nn.GroupNorm) и проходят через функцию активации (${\sigma(\cdot)}$, nn.GELU). Регуляризация выполняется алгоритмом Dropout (nn.Dropout1d) на выходе второй свертки.
 
 \begin{equation*}
     \begin{aligned}
@@ -40,13 +43,13 @@
     \end{aligned}
 \end{equation*}
 
-Между базовыми блоками проброшены residual-связи для более глубокой обучаемости слоев энкодера.
+Между базовыми блоками проброшены связи для более глубокой обучаемости слоев энкодера.
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{r_n} &= 
+        \mathbf{s_n} &= 
         \begin{cases} 
-            \mathbf{W}_n^r \ast \mathbf{x}_{n-1}, & \text{если} C_{in} \neq C_{out} \\
+            \mathbf{W}_n^s \ast \mathbf{x}_{n-1}, & \text{если} C_{in} \neq C_{out} \\
             \mathbf{x}_{n-1}, & \text{иначе}
         \end{cases} \\
         \mathbf{x}_{n} &= \sigma\left(\mathbf{z}_n^2 \oplus \mathbf{r_n}\right)
@@ -54,65 +57,20 @@
 \end{equation*}
 где ${\oplus}$ -- поэлементная сумма.
 
+Размерность выходного тензора уменьшается в 2 раза алгоритмом `nn.MaxPool1d'.
 
-\subsection{Attention-Gated Skip Connections}
-
-Фичи энкодера перед слиянием с фичами декодера взвешиваются. По аналогии с %\cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
-
-Допустим, из skip-connection выходит
-
-${\mathbf{x} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{x}}}}$.
-
-Выход декодера
-
-${\mathbf{g} \in \mathbb{R}^{B \times F_{\text{g}} \times L_{\text{g}}}}$.
-
-Выход энкодера сначала согласуется по размерности - приводится к размерности декодера.
-
-${\mathbf{x}' = \text{Interpolate}(\mathbf{x}, \text{size}=L_{\text{g}})}$.
-
-Затем фичи через матрицы весовых коэффициентов ${W_{\text{g}}}$, ${W_{\text{x}}}$ согласуются по числу фичей (приводятся к ${F_\text{int}}$)
-\begin{equation*}
-    \begin{aligned}
-        \mathbf{q} &= \mathcal{N}\left(\mathbf{W}_g \ast \mathbf{g}\right), \quad 
-        \mathbf{k} &= \mathcal{N}\left(\mathbf{W}_x \ast \mathbf{x}'\right)
-    \end{aligned}
-\end{equation*}
-где
-
-${\mathbf{q}, \mathbf{k} \in \mathbb{R}^{B \times F_{\text{int}} \times L_{\text{g}}}}$.
-
-\begin{equation*}
-    W_g \in \mathbb{R}^{F_{\text{int}} \times F_g \times 1}, \quad
-    W_x \in \mathbb{R}^{F_{\text{int}} \times F_l \times 1}, \quad
-    W_\psi \in \mathbb{R}^{1 \times F_{\text{int}} \times 1}
-\end{equation*}
-
-Суммируются и проходят через функцию активации.
-
-${\mathbf{a} = \sigma_{\text{ReLU}}\left(\mathbf{q} \oplus \mathbf{k}\right)}$.
-
-
-Преобразуются к одному каналу
-${\boldsymbol{\psi} = \sigma_{\text{Sigmoid}}\left(\mathcal{N}\left(\mathbf{W}_{\psi} \ast \mathbf{a}\right)\right)}$
-
-${\boldsymbol{\psi} \in \mathbb{R}^{B \times 1 \times L_{\text{g}}}}$.
-    
-В декодер поступает 
-
-${\mathbf{y} = \mathbf{x}' \odot \boldsymbol{\psi}}$
-
-${\mathbf{y} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{g}}}}$
-
+Таким образом, после каждого базового блока энкодера число $C$ каналов увеличивается в 2 раза, а размер $L$ уменьшается в 2 раза.
 
 \subsection{Bottleneck}
-Bottleneck реализован на алгоритме Multi-Head Self-Attention (MHSA). Входной тензор преобразован к размерности
+Bottleneck выделяет наиболее информативные признаки в скрытом пространстве. Реализован на алгоритме Multi-Head Self-Attention (MHSA).
 
-${\mathbf{x} \in \mathbb{R}^{B \times L \times C}}$
+На вход поступает тензор с выхода энкодера ${\mathbf{e}_4 \in \mathbb{R}^{C_4 \times L_4}}$. С помощью алгоритма `nn.MaxPool1d' длина тензора уменьшается в 2 раза, затем сверткой с матрицей ${\mathbf{W}_\text{proj}}$ число каналов увеличивается до ${C_5}$:
 
-и нормализован
+\begin{equation*}
+    \mathbf{b}_\text{proj} = \sigma\left(\mathcal{N}\left(\mathbf{W}_\text{proj} \ast \mathbf{e}_4{\downarrow_2}\right)\right),
+\end{equation*}
+где ${\mathbf{W}_\text{proj} \in \mathbb{R}^{C_5 \times C_4}}$
 
-$\mathbf{\hat{x}} = \mathcal{N}_1(\mathbf{x})$.
 
 Вычисляются h-голов; для каждой головы ${m \in \{1, \dots, h\}}$: 
 
@@ -188,6 +146,55 @@ Residual connection:
         \mathbf{y}_{\text{ds}}^{(k)} &= \mathbf{W}_{\text{ds}}^{(k)} \ast \mathbf{d}_{k+1} \quad \text{(training only)}
     \end{aligned}
 \end{equation*}
+
+\subsection{Attention-Gated Skip Connections}
+
+Фичи энкодера перед слиянием с фичами декодера взвешиваются. По аналогии с %\cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
+
+Допустим, из skip-connection выходит
+
+${\mathbf{x} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{x}}}}$.
+
+Выход декодера
+
+${\mathbf{g} \in \mathbb{R}^{B \times F_{\text{g}} \times L_{\text{g}}}}$.
+
+Выход энкодера сначала согласуется по размерности - приводится к размерности декодера.
+
+${\mathbf{x}' = \text{Interpolate}(\mathbf{x}, \text{size}=L_{\text{g}})}$.
+
+Затем фичи через матрицы весовых коэффициентов ${W_{\text{g}}}$, ${W_{\text{x}}}$ согласуются по числу фичей (приводятся к ${F_\text{int}}$)
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{q} &= \mathcal{N}\left(\mathbf{W}_g \ast \mathbf{g}\right), \quad 
+        \mathbf{k} &= \mathcal{N}\left(\mathbf{W}_x \ast \mathbf{x}'\right)
+    \end{aligned}
+\end{equation*}
+где
+
+${\mathbf{q}, \mathbf{k} \in \mathbb{R}^{B \times F_{\text{int}} \times L_{\text{g}}}}$.
+
+\begin{equation*}
+    W_g \in \mathbb{R}^{F_{\text{int}} \times F_g \times 1}, \quad
+    W_x \in \mathbb{R}^{F_{\text{int}} \times F_l \times 1}, \quad
+    W_\psi \in \mathbb{R}^{1 \times F_{\text{int}} \times 1}
+\end{equation*}
+
+Суммируются и проходят через функцию активации.
+
+${\mathbf{a} = \sigma_{\text{ReLU}}\left(\mathbf{q} \oplus \mathbf{k}\right)}$.
+
+
+Преобразуются к одному каналу
+${\boldsymbol{\psi} = \sigma_{\text{Sigmoid}}\left(\mathcal{N}\left(\mathbf{W}_{\psi} \ast \mathbf{a}\right)\right)}$
+
+${\boldsymbol{\psi} \in \mathbb{R}^{B \times 1 \times L_{\text{g}}}}$.
+    
+В декодер поступает 
+
+${\mathbf{y} = \mathbf{x}' \odot \boldsymbol{\psi}}$
+
+${\mathbf{y} \in \mathbb{R}^{B \times F_{\text{l}} \times L_{\text{g}}}}$
 
 
 ${\odot}$ - поэлементное умножение.
