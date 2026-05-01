@@ -42,7 +42,7 @@
 	\label{fig: encoder_block_diagram}
 \end{figure}
 
-Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки (${\ast}$, nn.Conv1d) с ядрами ${\mathbf{W}_n^1}$, ${\mathbf{W}_n^2}$, соответственно.
+Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^1}$, ${\mathbf{W}_n^2}$, соответственно.
 
 \begin{equation*}
     \begin{aligned}
@@ -51,15 +51,17 @@
         \mathbf{x}_{n} &= \mathbf{z}_n^2 \oplus \mathbf{s_n},
     \end{aligned}
 \end{equation*}
-где ${\oplus}$ -- поэлементная сумма, $\mathbf{s_n}$ -- сквозная связь \enquote{вход-выход} базового слоя (skip-connection):
+где ${\ast}$ -- операция сверкти, ${\oplus}$ -- поэлементная сумма.
+
+Сквозная связь \enquote{вход-выход} $\mathbf{s_n}$ (skip-connection) базового слоя приводится к числу каналов (фичей) на выходе (при необходимости):
 \begin{equation*}
     \mathbf{s_n} = 
         \begin{cases} 
-            \mathbf{W}_n^s \ast \mathbf{x}_{n-1}, & \text{если} \quad C_\text{in} \neq C_\text{out} \\
+            \mathbf{W}_n^s \ast \mathbf{x}_{n-1}, & \text{если} \quad F_{n-1} \neq F_{n} \\
             \mathbf{x}_{n-1}, & \text{иначе},
         \end{cases}
 \end{equation*}
-где ${\mathbf{W}_n^s \in \mathbb{R}^{C_\text{out} \times C_\text{in}}}$ -- ядро проекции.
+где ${\mathbf{W}_n^s \in \mathbb{R}^{F_{n} \times F_{n-1}}}$ -- ядро проекции.
 
 Между слоями энкодера выполняется уменьшение размерности тензор в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
 
