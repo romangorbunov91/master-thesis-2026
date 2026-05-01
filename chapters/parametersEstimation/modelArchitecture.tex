@@ -76,54 +76,55 @@
 Bottleneck выделяет наиболее информативные признаки в скрытом пространстве.
 
 С выхода энкодера поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$. На входе Bottleneck длина тензора уменьшается до ${L_4}$, а количество каналов увеличивается до ${F_4}$:
-
 \begin{equation*}
-    \mathbf{b}_\text{proj} = \sigma\left(\mathcal{N}\left(\mathbf{W}_\text{proj} \ast \mathbf{e}_3{\downarrow}\right)\right),
+    \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}\left(\mathbf{W}^P \ast \mathbf{e}_3{\downarrow}\right)\right),
 \end{equation*}
-где ${\mathbf{W}_\text{proj} \in \mathbb{R}^{F_4 \times F_3}}$, ${\mathbf{b}_\text{proj} \in \mathbb{R}^{F_4 \times L_4}}$.
+где ${\mathbf{W}^P \in \mathbb{R}^{F_4 \times F_3}}$, ${\mathbf{b}_\text{in} \in \mathbb{R}^{F_4 \times L_4}}$.
 
-Данные нормализуются и кодируются алгоритмом Multi-Head Self-Attention (MHSA) \cite{vaswani2017attention}:
+На входе данные нормализуются (pre-normalization, \cite{xiong2020layer}), затем тензор преобразуется (permute) к формату ${L \times F}$
 \begin{equation*}
-    \begin{aligned}
-        \mathbf{Q}_m &= \mathbf{b}_\text{proj} \mathbf{W}_m^Q, \\
-        \mathbf{K}_m &= \mathbf{b}_\text{proj} \mathbf{W}_m^K, \\
-        \mathbf{V}_m &= \mathbf{b}_\text{proj} \mathbf{W}_m^V, \\
-        \text{Attention}_m &= \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m, \\
-        \text{MultiHead}(\mathbf{\hat{x}}) &= \text{Concat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O
-    \end{aligned}
+    \mathbf{b}_\text{in} \rightarrow \mathcal{N}\left(\mathbf{b}_\text{in}\right) \rightarrow \mathbf{b}_\text{in.perm},
 \end{equation*}
-
-\begin{equation*}
-    \mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m \in \mathbb{R}^{L_4 \times d_k}
-\end{equation*}
-
-\begin{equation*}
-    \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V \in \mathbb{R}^{F_4 \times d_{k}}
-\end{equation*}
-где ${d_{k}=F_4/h}$, ${h}$ -- число \enquote{голов} алгоритма MHSA, ${m \in \{1, \dots, h\}}$.
-
-Residual connection:
-\begin{equation*}
-    \mathbf{x}' = \mathbf{x} \oplus \text{MHSA}(\mathbf{\hat{x}}).
-\end{equation*}
-
-Нормализация и MLP:
-\begin{equation*}
-    \text{MLP}(\mathbf{\tilde{x}}) = \text{Drop}\left(\mathbf{W}_2 \cdot \sigma_{\text{GELU}}\left(\mathbf{W}_1 \mathcal{N}_2(\mathbf{x}')\right)\right).
-\end{equation*}
+${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$, для совместимости с популярной реализацией алгоритма Multi-Head Self-Attention (MHSA, \cite{vaswani2017attention}):
 
 \begin{equation*}
     \begin{aligned}
-        W_1 & \in \mathbb{R}^{(rC) \times C}, \\
-        W_2 & \in \mathbb{R}^{C \times (rC)}.
+        \mathbf{Q}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^Q, \\
+        \mathbf{K}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^K, \\
+        \mathbf{V}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^V, \\
+        \mathbf{H}_m &= \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m,
     \end{aligned}
 \end{equation*}
-где $r$ - mlp-ratio.
+где
+\begin{flalign*}
+    & \begin{aligned}
+        \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V &\in \mathbb{R}^{F_4 \times d_{k}}, \\
+        \mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m, \mathbf{H}_m &\in \mathbb{R}^{L_4 \times d_k},
+    \end{aligned} &
+\end{flalign*}
+${d_{k}=F_4/h}$, ${m \in \{1, \dots, h\}}$.
 
-Residual connection:
+Результаты вычисления $h$-\enquote{голов} алгоритма MHSA конкатенируются
 \begin{equation*}
-    \mathbf{y} = \mathbf{x}' \oplus \text{MLP}(\mathbf{\tilde{x}})
+    \mathbf{MH}_\text{perm} = \text{Concat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O,
 \end{equation*}
+где ${\mathbf{W}^O} \in \mathbb{R}^{L_4 \times d_k}$, т.е. ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ -- той же размерности, что и ${\mathbf{b}_\text{in.perm}}$.
+
+Выход формируется в виде суммы со входным тензором, для чего размерности преобразуются обратно (${\mathbf{MH}_\text{perm} \rightarrow \mathbf{MH}}$). На выходе bottleneck выполняется нормализация и преобразование полносвязными слоями с промежуточным увеличением скрытого пространства в $r$-раз.
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{b}_\text{attn} &= \mathbf{b}_\text{in} \oplus \mathbf{MH}, \\
+        \mathbf{MLP} &= \text{Dropout}\left(\mathbf{W}^\text{MLP2} \cdot \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}\left( \mathbf{b}_\text{attn} \right)\right)\right), \\
+        \mathbf{b}_\text{out} &= \mathbf{b}_\text{attn} \oplus \mathbf{MLP},
+    \end{aligned}
+\end{equation*}
+\begin{flalign*}
+    & \begin{aligned}
+        \mathbf{W}^{\text{MLP1}} &\in \mathbb{R}^{(r \cdot F_4) \times F_4}, \\
+        \mathbf{W}^{\text{MLP2}} &\in \mathbb{R}^{F_4 \times (r \cdot F_4)},
+    \end{aligned} &
+\end{flalign*}
+где $r$ -- кратность масштабирования скрытого пространства в MLP-алгоритме.
 
 \begin{figure}[H]
 	\centering
