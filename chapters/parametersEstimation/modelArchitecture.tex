@@ -4,16 +4,15 @@
 \begin{itemize}
     \item CNN-энкодер с residual-связями;
     \item bottleneck на основе алгоритма attention;
-    \item ???-декодер;
+    \item CNN-декодер;
     \item attention gated-skip-связи между энкодером и декодером;
     \item финальный слой.
 \end{itemize}
 
-На вход автоэнкодера подается многоканальный тензор длиной ${L}$:
+На вход автоэнкодера подается ${C_{\text{in}}}$-канальный тензор длиной ${L}$:
 \begin{equation*}
-    {\mathbf{x}_{\text{in}} \in \mathbb{R}^{C_{\text{in}} \times L}},
+    {\mathbf{x}_{\text{in}} \in \mathbb{R}^{C_{\text{in}} \times L}}
 \end{equation*}
-где ${C_{\text{in}}}$ -- количество каналов.
 
 На выходе формируется многоканальная бинарная маска.
 
@@ -69,39 +68,39 @@
     \mathbf{x}_{n} \rightarrow \mathbf{x}_{n}{\downarrow_2}.
 \end{equation*}
 
+На входе всего энкодера задействован дополнительный сверточный слой (без нормализации и активации) с целью уменьшения шумов входных данных.
+
 Таким образом, в энкодере выполняется последовательное увеличение числа каналов (фичей) с одновременным уменьшением размерности тензора. Residual-архитектура с pre-activation обеспечивают лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}. Регуляризация выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
 
 \subsection{Bottleneck}
-Bottleneck выделяет наиболее информативные признаки в скрытом пространстве. Реализован на алгоритме Multi-Head Self-Attention (MHSA).
+Bottleneck выделяет наиболее информативные признаки в скрытом пространстве.
 
-С выхода энкодера поступает тензор ${\mathbf{e}_n \in \mathbb{R}^{F_3 \times L_3}}$. С помощью алгоритма \enquote{nn.MaxPool1d} длина тензора уменьшается до ${L_4}$, затем сверткой \enquote{nn.Conv1d} с ядром ${\mathbf{W}_\text{proj}}$ число каналов увеличивается до ${F_4}$:
+С выхода энкодера поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$. На входе Bottleneck длина тензора уменьшается до ${L_4}$, а количество каналов увеличивается до ${F_4}$:
 
 \begin{equation*}
-    \mathbf{b}_\text{proj} = \sigma\left(\mathcal{N}\left(\mathbf{W}_\text{proj} \ast \mathbf{e}_3{\downarrow_2}\right)\right),
+    \mathbf{b}_\text{proj} = \sigma\left(\mathcal{N}\left(\mathbf{W}_\text{proj} \ast \mathbf{e}_3{\downarrow}\right)\right),
 \end{equation*}
-где ${\mathbf{W}_\text{proj} \in \mathbb{R}^{F_4 \times F_3}}$
+где ${\mathbf{W}_\text{proj} \in \mathbb{R}^{F_4 \times F_3}}$, ${\mathbf{b}_\text{proj} \in \mathbb{R}^{F_4 \times L_4}}$.
 
-
-Вычисляются h-голов; для каждой головы ${m \in \{1, \dots, h\}}$: 
-
+Данные нормализуются и кодируются алгоритмом Multi-Head Self-Attention (MHSA) \cite{vaswani2017attention}:
 \begin{equation*}
     \begin{aligned}
-        Q_m &= X W_m^Q \in \mathbb{R}^{L \times d_k} \\
-        K_m &= X W_m^K \in \mathbb{R}^{L \times d_k} \\
-        V_m &= X W_m^V \in \mathbb{R}^{L \times d_k} \\
-        \text{Head}_m &= \text{Softmax}\left(\frac{Q_m K_m^\top}{\sqrt{d_k}}\right) V_m
+        \mathbf{Q}_m &= \mathbf{b}_\text{proj} \mathbf{W}_m^Q, \\
+        \mathbf{K}_m &= \mathbf{b}_\text{proj} \mathbf{W}_m^K, \\
+        \mathbf{V}_m &= \mathbf{b}_\text{proj} \mathbf{W}_m^V, \\
+        \text{Attention}_m &= \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m, \\
+        \text{MultiHead}(\mathbf{\hat{x}}) &= \text{Concat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O
     \end{aligned}
 \end{equation*}
 
 \begin{equation*}
-    W_m^Q, W_m^K, W_m^V \in \mathbb{R}^{C \times d_{k}}
+    \mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m \in \mathbb{R}^{L_4 \times d_k}
 \end{equation*}
-где ${d_{k}=C/h}$.
 
-Слияние результатов вычислений:
 \begin{equation*}
-    \text{MHSA}(\mathbf{\hat{x}}) = \text{Concat}(\text{Head}_1, \dots, \text{Head}_h)\mathbf{W}^O
+    \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V \in \mathbb{R}^{F_4 \times d_{k}}
 \end{equation*}
+где ${d_{k}=F_4/h}$, ${h}$ -- число \enquote{голов} алгоритма MHSA, ${m \in \{1, \dots, h\}}$.
 
 Residual connection:
 \begin{equation*}
@@ -125,6 +124,14 @@ Residual connection:
 \begin{equation*}
     \mathbf{y} = \mathbf{x}' \oplus \text{MLP}(\mathbf{\tilde{x}})
 \end{equation*}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=0.25\linewidth] {parametersEstimation/bottleneck_block_diagram.drawio.png}
+
+	\caption{Блок-схема bottlneck-алгоритма}
+	\label{fig: bottleneck_block_diagram}
+\end{figure}
 
 \subsection{Декодер}
 Каждый слой декодера поднимает разрешение массива. Далее свертка, нормализация, активация.
@@ -159,7 +166,7 @@ Residual connection:
 
 \subsection{Attention-Gated Skip Connections}
 
-Фичи энкодера перед слиянием с фичами декодера взвешиваются. По аналогии с %\cite{Attention_U_Net} https://arxiv.org/abs/1804.03999
+Фичи энкодера перед слиянием с фичами декодера взвешиваются. По аналогии с \cite{oktay2018attention}
 
 Допустим, из skip-connection выходит
 

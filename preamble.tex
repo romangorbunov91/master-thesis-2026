@@ -80,6 +80,39 @@
   {1em}
   {\fontsize{14pt}{17pt}\selectfont}
 
+% Calculate width for longest appendix label: "Приложение Я "
+\newlength{\appchapnumwidth}
+\settowidth{\appchapnumwidth}{\normalfont\cftchapfont Приложение~Я.}
+\addtolength{\appchapnumwidth}{0.0em}
+
+\makeatletter
+\newcommand{\cyralph}[1]{%
+  \ifcase#1\or А\or Б\or В\or Г\or Д\or Е\or Ж\or З\or И\or К\or Л\or М\or Н\or О\or П\or Р\or С\or Т\or У\or Ф\or Х\or Ц\or Ч\or Ш\or Щ\or Ъ\or Ы\or Ь\or Э\or Ю\or Я\else ??\fi}
+\makeatother
+
+\newcommand{\setupappendix}{%
+  \setcounter{chapter}{0}%
+  \renewcommand{\chaptername}{Приложение}%
+  \renewcommand{\thechapter}{\cyralph{\value{chapter}}}%
+  \renewcommand{\theHchapter}{app\thechapter}%
+  \addtocontents{toc}{%
+    \protect\renewcommand{\protect\cftchappresnum}{Приложение~}%
+    \protect\renewcommand{\protect\cftchapaftersnum}{.\ }% Period + space in TOC.
+    \protect\setlength{\protect\cftchapnumwidth}{\the\appchapnumwidth}%
+  }%
+  
+  % Counters reset per appendix.
+  \counterwithin*{section}{chapter}%
+  \counterwithin*{figure}{chapter}%
+  \counterwithin*{table}{chapter}%
+  
+  % Period appears ONLY in the printed heading.
+  \titleformat{\chapter}[display]
+    {\normalfont\centering\bfseries}
+    {}
+    {0pt}
+    {\fontsize{16pt}{20pt}\selectfont\chaptername~\thechapter.\hspace{0.25em}}%
+}
 
 % --- Math & graphics ---
 \usepackage{amsmath, amssymb, mathtools}
