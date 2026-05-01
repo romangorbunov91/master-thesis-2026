@@ -95,14 +95,14 @@ ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$, для совме
         \mathbf{H}_m &= \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m,
     \end{aligned}
 \end{equation*}
-где
+где ${d_{k}=F_4/h}$,
 \begin{flalign*}
     & \begin{aligned}
         \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V &\in \mathbb{R}^{F_4 \times d_{k}}, \\
         \mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m, \mathbf{H}_m &\in \mathbb{R}^{L_4 \times d_k},
     \end{aligned} &
 \end{flalign*}
-${d_{k}=F_4/h}$, ${m \in \{1, \dots, h\}}$.
+${m \in \{1, \dots, h\}}$.
 
 Результаты вычисления $h$-\enquote{голов} алгоритма MHSA конкатенируются
 \begin{equation*}
