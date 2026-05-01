@@ -1,6 +1,6 @@
 \section{Архитектура модели}
 
-Модель основана на автоэнкодере, структурно состоящем из следующих основных блоков:
+Модель основана на автокодировщике, структурно состоящем из следующих основных блоков:
 \begin{itemize}
     \item CNN-энкодер с residual-связями;
     \item bottleneck на основе алгоритма attention;
@@ -32,44 +32,52 @@
 \end{figure}
 
 \subsection{Энкодер}
-Энкодер преобразует входные данные в скрытое пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки (${\ast}$, nn.Conv1d) с ядрами ${W_n^1}$, ${W_n^2}$, соответственно.
+Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена residual-архитектура базового блока по типу \enquote{pre-activation}.
 
-Тензоры на выходе каждого сверточного слоя нормализуются (${\mathcal{N}(\cdot)}$, nn.GroupNorm) и проходят через функцию активации (${\sigma(\cdot)}$, nn.GELU). Регуляризация выполняется алгоритмом Dropout (nn.Dropout1d) на выходе второй свертки.
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=0.25\linewidth] {parametersEstimation/encoder_block_diagram.drawio.png}
+
+	\caption{Блок-схема базового блока энкодера}
+	\label{fig: encoder_block_diagram}
+\end{figure}
+
+Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки (${\ast}$, nn.Conv1d) с ядрами ${\mathbf{W}_n^1}$, ${\mathbf{W}_n^2}$, соответственно.
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{z}_n^1 &= \sigma\left(\mathcal{N}\left(\mathbf{W}_n^1 \ast \mathbf{x}_{n-1}\right)\right) \\
-        \mathbf{z}_n^2 &= \text{Dropout}\left(\sigma\left(\mathcal{N}\left(\mathbf{W}_n^2 \ast \mathbf{z}_n^1\right)\right)\right).
+        \mathbf{z}_n^1 &= \mathbf{W}_n^1 \ast \sigma\left(\mathcal{N}\left(\mathbf{x}_{n-1}\right)\right), \\
+        \mathbf{z}_n^2 &= \mathbf{W}_n^2 \ast \sigma\left(\mathcal{N}\left(\mathbf{z}_n^1\right)\right), \\
+        \mathbf{x}_{n} &= \mathbf{z}_n^2 \oplus \mathbf{s_n},
     \end{aligned}
 \end{equation*}
-
-Между базовыми блоками проброшены связи для более глубокой обучаемости слоев энкодера.
-
+где ${\oplus}$ -- поэлементная сумма, $\mathbf{s_n}$ -- сквозная связь \enquote{вход-выход} базового слоя (skip-connection):
 \begin{equation*}
-    \begin{aligned}
-        \mathbf{s_n} &= 
+    \mathbf{s_n} = 
         \begin{cases} 
-            \mathbf{W}_n^s \ast \mathbf{x}_{n-1}, & \text{если} C_{in} \neq C_{out} \\
-            \mathbf{x}_{n-1}, & \text{иначе}
-        \end{cases} \\
-        \mathbf{x}_{n} &= \sigma\left(\mathbf{z}_n^2 \oplus \mathbf{r_n}\right)
-    \end{aligned}
+            \mathbf{W}_n^s \ast \mathbf{x}_{n-1}, & \text{если} \quad C_\text{in} \neq C_\text{out} \\
+            \mathbf{x}_{n-1}, & \text{иначе},
+        \end{cases}
 \end{equation*}
-где ${\oplus}$ -- поэлементная сумма.
+где ${\mathbf{W}_n^s \in \mathbb{R}^{C_\text{out} \times C_\text{in}}}$ -- ядро проекции.
 
-Размерность выходного тензора уменьшается в 2 раза алгоритмом `nn.MaxPool1d'.
+Между слоями энкодера выполняется уменьшение размерности тензор в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
 
-Таким образом, после каждого базового блока энкодера число $C$ каналов увеличивается в 2 раза, а размер $L$ уменьшается в 2 раза.
+\begin{equation*}
+    \mathbf{x}_{n} \rightarrow \mathbf{x}_{n}{\downarrow_2}.
+\end{equation*}
+
+Таким образом, в энкодере выполняется последовательное увеличение числа каналов (фичей) с одновременным уменьшением размерности тензора. Residual-архитектура с pre-activation обеспечивают лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}. Регуляризация выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
 
 \subsection{Bottleneck}
 Bottleneck выделяет наиболее информативные признаки в скрытом пространстве. Реализован на алгоритме Multi-Head Self-Attention (MHSA).
 
-На вход поступает тензор с выхода энкодера ${\mathbf{e}_4 \in \mathbb{R}^{C_4 \times L_4}}$. С помощью алгоритма `nn.MaxPool1d' длина тензора уменьшается в 2 раза, затем сверткой с матрицей ${\mathbf{W}_\text{proj}}$ число каналов увеличивается до ${C_5}$:
+С выхода энкодера поступает тензор ${\mathbf{e}_n \in \mathbb{R}^{F_3 \times L_3}}$. С помощью алгоритма \enquote{nn.MaxPool1d} длина тензора уменьшается до ${L_4}$, затем сверткой \enquote{nn.Conv1d} с ядром ${\mathbf{W}_\text{proj}}$ число каналов увеличивается до ${F_4}$:
 
 \begin{equation*}
-    \mathbf{b}_\text{proj} = \sigma\left(\mathcal{N}\left(\mathbf{W}_\text{proj} \ast \mathbf{e}_4{\downarrow_2}\right)\right),
+    \mathbf{b}_\text{proj} = \sigma\left(\mathcal{N}\left(\mathbf{W}_\text{proj} \ast \mathbf{e}_3{\downarrow_2}\right)\right),
 \end{equation*}
-где ${\mathbf{W}_\text{proj} \in \mathbb{R}^{C_5 \times C_4}}$
+где ${\mathbf{W}_\text{proj} \in \mathbb{R}^{F_4 \times F_3}}$
 
 
 Вычисляются h-голов; для каждой головы ${m \in \{1, \dots, h\}}$: 
