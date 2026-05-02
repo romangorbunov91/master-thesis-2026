@@ -11,32 +11,31 @@
 \usepackage{indentfirst}
 \usepackage[protrusion=true, expansion=false]{microtype}
 \usepackage{float}
-\usepackage{tocloft}
 \usepackage{titlesec}
+\usepackage{titletoc}
 
 % TOC Title: "Содержание" & Centered.
 \addto\captionsrussian{\renewcommand{\contentsname}{Содержание}}
-\makeatletter
-\renewcommand{\@cftmaketoctitle}{%
-  \chapter*{\contentsname}%
-  \@mkboth{\contentsname}{\contentsname}%
-  \@starttoc{toc}%
-}
-\makeatother
-% Removes bold (makes normal weight) from chapter titles in ToC.
-\renewcommand{\cftchapfont}{\normalfont}
-% Removes bold from chapter page numbers.
-\renewcommand{\cftchappagefont}{\normalfont}
-% Enables dots for all chapters in TOC.
-\renewcommand{\cftchapdotsep}{\cftdotsep}  
-% Forces identical baseline & style.
-\renewcommand{\cftchapleader}{\normalfont\cftdotfill{\cftdotsep}}
-% Chapter → Chapter/Section gap.
-\setlength{\cftbeforechapskip}{0pt}
-% Section → Section gap.
-\setlength{\cftbeforesecskip}{0pt}
-% Subsection → Subsection gap.
-\setlength{\cftbeforesubsecskip}{0pt}
+\titlecontents{chapter}[0pt]
+  {\vspace{0pt}\normalfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[1pc]{.}\contentspage}
+  []
+
+\titlecontents{section}[1.5em]
+  {\vspace{0pt}\normalfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[1pc]{.}\contentspage}
+  []
+
+\titlecontents{subsection}[3.0em]
+  {\vspace{0pt}\normalfont}
+  {\thecontentslabel\hspace{1em}}
+  {}
+  {\titlerule*[1pc]{.}\contentspage}
+  []
 
 \usepackage{comment}
 
@@ -70,7 +69,7 @@
   {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont} % <format>
   {}                                        % <label> (empty → removes separate block)
   {0pt}                                     % <sep>
-  {\thechapter\quad} % <before-code>
+  {\thechapter{.}\quad} % <before-code>
 
 % Unnumbered chapters (\chapter*{...}).
 \titleformat{name=\chapter,numberless}[display]
@@ -82,22 +81,15 @@
 % Section and Subsection: 14pt, left-aligned, numbered.
 \titleformat{\section}
   {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {\thesection}
+  {\thesection{.}}
   {1em}
   {}
 
 \titleformat{\subsection}
   {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {\thesubsection}
+  {\thesubsection{.}}
   {1em}
   {}
-
-% Calculate width for longest appendix label: "Приложение Я ".
-\newlength{\appchapnumwidth}
-\AtBeginDocument{%
-  \settowidth{\appchapnumwidth}{\normalfont\cftchapfont Приложение~Я.}
-}
-\addtolength{\appchapnumwidth}{0.0em}
 
 \makeatletter
 \newcommand{\cyralph}[1]{%
@@ -109,18 +101,20 @@
   \renewcommand{\chaptername}{Приложение}%
   \renewcommand{\thechapter}{\cyralph{\value{chapter}}}%
   \renewcommand{\theHchapter}{app\thechapter}%
+  
+  % Safely override chapter TOC format for appendices
   \addtocontents{toc}{%
-    \protect\renewcommand{\protect\cftchappresnum}{Приложение~}%
-    \protect\renewcommand{\protect\cftchapaftersnum}{.\ }% Period + space in TOC.
-    \protect\setlength{\protect\cftchapnumwidth}{\the\appchapnumwidth}%
+    \protect\titlecontents{chapter}[0pt]{\vspace{0pt}\normalfont}%
+      {\protect\chaptername\ \thecontentslabel.\quad}{}%
+      {\protect\titlerule*[1pc]{.}\protect\contentspage}[]%
   }%
   
-  % Counters reset per appendix.
-  \counterwithin*{section}{chapter}%
-  \counterwithin*{figure}{chapter}%
-  \counterwithin*{table}{chapter}%
+  % Reset counters per appendix
+  \counterwithin{section}{chapter}%
+  \counterwithin{figure}{chapter}%
+  \counterwithin{table}{chapter}%
   
-  % Period appears ONLY in the printed heading.
+  % Chapter heading format for appendices
   \titleformat{\chapter}[display]
     {\normalfont\centering\bfseries\fontsize{14pt}{17pt}\selectfont}
     {}
@@ -137,6 +131,10 @@
 \usepackage{graphicx}
 \graphicspath{{images/}}
 
+% Bibliography (ГОСТ стиль).
+\usepackage[style=gost-numeric, sorting=none, backend=biber]{biblatex}
+\addbibresource{references.bib}
+
 % --- Hyperlinks & bookmarks ---
 \usepackage{hyperref}
 \hypersetup{
@@ -147,7 +145,3 @@
   pdftitle={Master thesis},
   pdfauthor={Roman Gorbunov}
 }
-
-% --- Bibliography (ГОСТ стиль) ---
-\usepackage[style=gost-numeric, sorting=none, backend=biber]{biblatex}
-\addbibresource{references.bib}
