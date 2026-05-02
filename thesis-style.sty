@@ -45,12 +45,12 @@
     \end{tabular}
 
     \vfill
-    \large \@universityCity, \@releaseYear
+    \fontsize{14pt}{17pt}\selectfont\@universityCity, \@releaseYear
   \end{titlepage}%
   \thispagestyle{empty}%
 }
 
-% --- Helper: unnumbered chapter with TOC entry ---
+% Unnumbered chapter with TOC entry.
 \newcommand{\unnumberedChapter}[2][chapter]{%
   \chapter*{#2}%
   \addcontentsline{toc}{#1}{#2}%
@@ -60,12 +60,6 @@
 \titlespacing*{\chapter}
   {0pt}   % left
   {0pt}  % top (reduce to shrink gap)
-  {20pt}  % bottom
-
-\titleformat{\chapter}[display]
-  {\normalfont\centering}          % <format>: overall wrapper style
-  {}                               % <label>: empty → removes separate label block
-  {0pt}                            % <sep>: ignored when label is empty
-  {\Huge\bfseries\thechapter\quad} % <before-code>: number + spacing + title text
+  {18pt}  % bottom
 
 \endinput

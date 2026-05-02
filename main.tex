@@ -1,4 +1,4 @@
-\documentclass[a4paper, oneside, 12pt]{report}
+\documentclass[a4paper, oneside, 14pt]{extreport}
 \input{preamble.tex}
 \usepackage{thesis-style}
 
@@ -14,14 +14,13 @@
 \releaseYear{2026}
 
 \begin{document}
+\pagenumbering{arabic}
+\makeThesisTitle % Title page.
+\thispagestyle{empty}
+\clearpage
+\pagestyle{plain}
 
-% Title page.
-\makeThesisTitle
-
-% Annotation.
-\unnumberedChapter{Аннотация}
-Краткое описание работы. \par
-\textbf{Ключевые слова:} ключ1, ключ2, ключ3.
+\include{chapters/annotation}
 
 % Table of Contents
 \clearpage
@@ -41,4 +40,5 @@
 
 \setupappendix
 \include{chapters/appendices/main_appendices}
+
 \end{document}

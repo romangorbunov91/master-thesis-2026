@@ -1,6 +1,8 @@
 % --- Russian support & typography ---
 \usepackage[T2A]{fontenc}      % Cyrillic font encoding
-\usepackage[utf8]{inputenc}    % UTF-8 source input
+%\usepackage[utf8]{inputenc}    % UTF-8 source input
+\usepackage{tempora}   % Times New Roman for main text.
+\usepackage{newtxmath}   % Times New Roman for math symbols.
 \usepackage{cmap}              % Makes Cyrillic text searchable/copyable in PDF
 \usepackage[russian]{babel}    % Russian hyphenation & captions
 \usepackage[autostyle=true, style=russian]{csquotes}
@@ -9,8 +11,18 @@
 \usepackage{indentfirst}
 \usepackage[protrusion=true, expansion=false]{microtype}
 \usepackage{float}
-\usepackage{titlesec}
 \usepackage{tocloft}
+\usepackage{titlesec}
+
+% TOC Title: "Содержание" & Centered.
+\addto\captionsrussian{\renewcommand{\contentsname}{Содержание}}
+\makeatletter
+\renewcommand{\@cftmaketoctitle}{%
+  \chapter*{\contentsname}%
+  \@mkboth{\contentsname}{\contentsname}%
+  \@starttoc{toc}%
+}
+\makeatother
 % Removes bold (makes normal weight) from chapter titles in ToC.
 \renewcommand{\cftchapfont}{\normalfont}
 % Removes bold from chapter page numbers.
@@ -53,36 +65,38 @@
   headheight=15pt
 }
 
-% ─── Chapter: 16pt, centered, numbered inline ───
+% Chapter: size (pt), centered, numbered inline.
 \titleformat{\chapter}[display]
-  {\normalfont\centering\bfseries}          % <format>
+  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont} % <format>
   {}                                        % <label> (empty → removes separate block)
   {0pt}                                     % <sep>
-  {\fontsize{16pt}{20pt}\selectfont\thechapter\quad} % <before-code>
+  {\thechapter\quad} % <before-code>
 
-% ─── Unnumbered chapters (\chapter*{...}) ───
+% Unnumbered chapters (\chapter*{...}).
 \titleformat{name=\chapter,numberless}[display]
-  {\normalfont\centering\bfseries}
+  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont}
   {}
   {0pt}
-  {\fontsize{16pt}{20pt}\selectfont}
+  {}
 
-% Section and Subsection: 14pt, left-aligned, numbered ───
+% Section and Subsection: 14pt, left-aligned, numbered.
 \titleformat{\section}
-  {\normalfont\bfseries}
+  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
   {\thesection}
   {1em}
-  {\fontsize{14pt}{17pt}\selectfont}
+  {}
 
 \titleformat{\subsection}
-  {\normalfont\bfseries}
+  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
   {\thesubsection}
   {1em}
-  {\fontsize{14pt}{17pt}\selectfont}
+  {}
 
-% Calculate width for longest appendix label: "Приложение Я "
+% Calculate width for longest appendix label: "Приложение Я ".
 \newlength{\appchapnumwidth}
-\settowidth{\appchapnumwidth}{\normalfont\cftchapfont Приложение~Я.}
+\AtBeginDocument{%
+  \settowidth{\appchapnumwidth}{\normalfont\cftchapfont Приложение~Я.}
+}
 \addtolength{\appchapnumwidth}{0.0em}
 
 \makeatletter
@@ -108,10 +122,10 @@
   
   % Period appears ONLY in the printed heading.
   \titleformat{\chapter}[display]
-    {\normalfont\centering\bfseries}
+    {\normalfont\centering\bfseries\fontsize{14pt}{17pt}\selectfont}
     {}
     {0pt}
-    {\fontsize{16pt}{20pt}\selectfont\chaptername~\thechapter.\hspace{0.25em}}%
+    {\chaptername~\thechapter.\hspace{0.25em}}%
 }
 
 % --- Math & graphics ---

@@ -50,7 +50,7 @@
         \mathbf{x}_{n} &= \mathbf{z}_n^2 \oplus \mathbf{s_n},
     \end{aligned}
 \end{equation*}
-где ${\ast}$ -- операция сверкти, ${\oplus}$ -- поэлементная сумма.
+где ${\ast}$ -- операция свертки, ${\oplus}$ -- поэлементная сумма.
 
 Сквозная связь \enquote{вход-выход} $\mathbf{s_n}$ (skip-connection) базового слоя приводится к числу каналов (фичей) на выходе (при необходимости):
 \begin{equation*}
@@ -73,7 +73,15 @@
 Таким образом, в энкодере выполняется последовательное увеличение числа каналов (фичей) с одновременным уменьшением размерности тензора. Residual-архитектура с pre-activation обеспечивают лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}. Регуляризация выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
 
 \subsection{Bottleneck}
-Bottleneck выделяет наиболее информативные признаки в скрытом пространстве.
+Bottleneck на основе трансформера выделяет наиболее информативные признаки в скрытом пространстве.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/bottleneck_block_diagram.drawio.png}
+
+	\caption{Блок-схема bottleneck-алгоритма}
+	\label{fig: bottleneck_block_diagram}
+\end{figure}
 
 С выхода энкодера поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$. На входе Bottleneck длина тензора уменьшается до ${L_4}$, а количество каналов увеличивается до ${F_4}$:
 \begin{equation*}
@@ -110,14 +118,20 @@ ${m \in \{1, \dots, h\}}$.
 \end{equation*}
 где ${\mathbf{W}^O} \in \mathbb{R}^{L_4 \times d_k}$, т.е. ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ -- той же размерности, что и ${\mathbf{b}_\text{in.perm}}$.
 
-Выход формируется в виде суммы со входным тензором, для чего размерности преобразуются обратно (${\mathbf{MH}_\text{perm} \rightarrow \mathbf{MH}}$). На выходе bottleneck выполняется нормализация и преобразование полносвязными слоями с промежуточным увеличением скрытого пространства в $r$-раз.
+Выход формируется в виде суммы со входным тензором, для чего размерности преобразуются обратно (${\mathbf{MH}_\text{perm} \rightarrow \mathbf{MH}}$).
+
 \begin{equation*}
-    \begin{aligned}
-        \mathbf{b}_\text{attn} &= \mathbf{b}_\text{in} \oplus \mathbf{MH}, \\
-        \mathbf{MLP} &= \text{Dropout}\left(\mathbf{W}^\text{MLP2} \cdot \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}\left( \mathbf{b}_\text{attn} \right)\right)\right), \\
-        \mathbf{b}_\text{out} &= \mathbf{b}_\text{attn} \oplus \mathbf{MLP},
-    \end{aligned}
+    \mathbf{b}_\text{attn} = \mathbf{b}_\text{in} \oplus \mathbf{MH}.
 \end{equation*}
+
+После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (Multi-Layer Perceptron, MLP). Реализованы два Feed-Forward-слоя с промежуточным увеличением скрытого пространства в $r$-раз:
+\begin{equation*}
+    \mathbf{MLP} = \text{Dropout}\left(\mathbf{W}^\text{MLP2} \cdot \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}\left( \mathbf{b}_\text{attn} \right)\right)\right),
+\end{equation*}
+\begin{equation*}
+    \mathbf{b}_\text{out} = \mathbf{b}_\text{attn} \oplus \mathbf{MLP},
+\end{equation*}
+
 \begin{flalign*}
     & \begin{aligned}
         \mathbf{W}^{\text{MLP1}} &\in \mathbb{R}^{(r \cdot F_4) \times F_4}, \\
@@ -126,13 +140,7 @@ ${m \in \{1, \dots, h\}}$.
 \end{flalign*}
 где $r$ -- кратность масштабирования скрытого пространства в MLP-алгоритме.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=0.25\linewidth] {parametersEstimation/bottleneck_block_diagram.drawio.png}
-
-	\caption{Блок-схема bottlneck-алгоритма}
-	\label{fig: bottleneck_block_diagram}
-\end{figure}
+Регуляризация выполняется алгоритмом \enquote{nn.Dropout} после каждого Feed-Forward-слоя.
 
 \subsection{Декодер}
 Каждый слой декодера поднимает разрешение массива. Далее свертка, нормализация, активация.
@@ -145,7 +153,8 @@ ${m \in \{1, \dots, h\}}$.
     \end{aligned}
 \end{equation*}
 
-\begin{equation*}
+\begin{comment}
+    \begin{equation*}
     \begin{aligned}
         &\textbf{Encoder:} \\
         \mathbf{e}_1 &= f_{\text{res}}^{(1)}(\mathbf{x}), \quad 
@@ -164,6 +173,7 @@ ${m \in \{1, \dots, h\}}$.
         \mathbf{y}_{\text{ds}}^{(k)} &= \mathbf{W}_{\text{ds}}^{(k)} \ast \mathbf{d}_{k+1} \quad \text{(training only)}
     \end{aligned}
 \end{equation*}
+\end{comment}
 
 \subsection{Attention-Gated Skip Connections}
 
