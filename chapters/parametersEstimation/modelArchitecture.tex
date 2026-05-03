@@ -1,30 +1,33 @@
 \section{Архитектура модели}
 
-Модель основана на автокодировщике, структурно состоящем из следующих основных блоков:
+Модель основана на автокодировщике, выполняющем преобразование ${C_{\text{in}}}$-канального тензора длиной ${L}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
+\begin{equation*}
+    \Gamma: \mathbb{R}^{C_{\text{in}} \times L} \mapsto \mathbb{R}^{C_{\text{out}} \times L}.
+\end{equation*}
+
+Выход представляет собой бинарную маску, каждый канал которой соответствует типу детектируемых объектов.
+
+Преобразование ${\Gamma}$ выполняется в 3 основных этапа:
 \begin{itemize}
-    \item CNN-энкодер с residual-связями;
-    \item bottleneck на основе алгоритма attention;
-    \item CNN-декодер;
-    \item attention gated-skip-связи между энкодером и декодером;
-    \item финальный слой.
+    \item Кодирование в скрытое (латентное) пространство (CNN-энкодер):
+        \begin{equation*}
+            \textbf{F}: \mathbb{R}^{F_1 \times L_1} \mapsto \mathbb{R}^{F_3 \times L_3}.
+        \end{equation*}
+    \item Выделение наиболее информативных признаков в скрытом пространстве (bottleneck):
+        \begin{equation*}
+            \textbf{H}: \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4}.
+        \end{equation*}
+    \item Декодирование из скрытого пространства (CNN-декодер):
+        \begin{equation*}
+            \textbf{Y}: \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_1 \times L_1}.
+        \end{equation*}
 \end{itemize}
 
-На вход автоэнкодера подается ${C_{\text{in}}}$-канальный тензор длиной ${L}$:
-\begin{equation*}
-    {\mathbf{x}_{\text{in}} \in \mathbb{R}^{C_{\text{in}} \times L}}
-\end{equation*}
-
-На выходе формируется многоканальная бинарная маска.
-
-\begin{equation*}
-    {\mathbf{x}_{\text{out}} \in \mathbb{R}^{C_{\text{out}} \times L}}.
-\end{equation*}
-
-Количество каналов маски ${C_{\text{out}}}$ соответствует количеству детектируемых объектов.
+На входе и выходе архитектуры имеются дополнительные сверточные слой (без нормализации и активации). В декодер проброшены attention gated-skip-связи.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=0.85\linewidth] {parametersEstimation/model_block_diagram.drawio.png}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/model_block_diagram.drawio.png}
 
 	\caption{Блок-схема архитектуры модели}
 	\label{fig: model_block_diagram}
@@ -45,7 +48,7 @@
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{z}_n^1 &= \mathbf{W}_n^1 \ast \sigma\left(\mathcal{N}\left(\mathbf{x}_{n-1}\right)\right), \\
+        \mathbf{z}_n^1 &= \mathbf{W}_n^1 \ast \sigma\left(\mathcal{N}\left(\mathbf{e}_{n-1}\right)\right), \\
         \mathbf{z}_n^2 &= \mathbf{W}_n^2 \ast \sigma\left(\mathcal{N}\left(\mathbf{z}_n^1\right)\right), \\
         \mathbf{x}_{n} &= \mathbf{z}_n^2 \oplus \mathbf{s_n},
     \end{aligned}
@@ -56,8 +59,8 @@
 \begin{equation*}
     \mathbf{s_n} = 
         \begin{cases} 
-            \mathbf{W}_n^s \ast \mathbf{x}_{n-1}, & \text{если} \quad F_{n-1} \neq F_{n} \\
-            \mathbf{x}_{n-1}, & \text{иначе},
+            \mathbf{W}_n^s \ast \mathbf{e}_{n-1}, & \text{если} \quad F_{n-1} \neq F_{n} \\
+            \mathbf{e}_{n-1}, & \text{иначе},
         \end{cases}
 \end{equation*}
 где ${\mathbf{W}_n^s \in \mathbb{R}^{F_{n} \times F_{n-1}}}$ -- ядро проекции.
@@ -65,15 +68,13 @@
 Между слоями энкодера выполняется уменьшение размерности тензор в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
 
 \begin{equation*}
-    \mathbf{x}_{n} \rightarrow \mathbf{x}_{n}{\downarrow_2}.
+    \mathbf{e}_{n} \rightarrow \mathbf{e}_{n}{\downarrow_2}.
 \end{equation*}
-
-На входе всего энкодера задействован дополнительный сверточный слой (без нормализации и активации) с целью уменьшения шумов входных данных.
 
 Таким образом, в энкодере выполняется последовательное увеличение числа каналов (фичей) с одновременным уменьшением размерности тензора. Residual-архитектура с pre-activation обеспечивают лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}. Регуляризация выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
 
 \subsection{Bottleneck}
-Bottleneck на основе трансформера выделяет наиболее информативные признаки в скрытом пространстве.
+Bottleneck реализован на основе трансформера.
 
 \begin{figure}[H]
 	\centering
