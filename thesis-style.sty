@@ -1,6 +1,7 @@
 % thesis-style.sty
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{thesis-style}[2026/04/25 ITMO Master's Thesis Style]
+\RequirePackage{titlesec}
 
 % --- Metadata commands ---
 \newcommand{\universityName}[1]{\gdef\@universityName{#1}}
@@ -24,7 +25,7 @@
 \def\@releaseYear{}
 \def\@advisorName{}
 
-% --- Custom Title Page ---
+% Custom Title Page.
 \newcommand{\makeThesisTitle}{%
   \begin{titlepage}
     \singlespacing
@@ -56,7 +57,7 @@
   \addcontentsline{toc}{#1}{#2}%
 }
 
-% --- Chapter spacing & formatting ---
+% Chapter spacing & formatting.
 \titlespacing*{\chapter}
   {0pt}   % left
   {0pt}  % top (reduce to shrink gap)

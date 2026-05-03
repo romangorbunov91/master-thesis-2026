@@ -1,20 +1,67 @@
 % --- Russian support & typography ---
 \usepackage[T2A]{fontenc}      % Cyrillic font encoding
-%\usepackage[utf8]{inputenc}    % UTF-8 source input
 \usepackage{tempora}   % Times New Roman for main text.
 \usepackage{newtxmath}   % Times New Roman for math symbols.
 \usepackage{cmap}              % Makes Cyrillic text searchable/copyable in PDF
 \usepackage[russian]{babel}    % Russian hyphenation & captions
 \usepackage[autostyle=true, style=russian]{csquotes}
-
-%\usepackage{csquotes}
 \usepackage{indentfirst}
 \usepackage[protrusion=true, expansion=false]{microtype}
-\usepackage{float}
-\usepackage{titlesec}
-\usepackage{titletoc}
 
-% TOC Title: "Содержание" & Centered.
+% Page layout & spacing.
+\usepackage{geometry}
+\geometry{
+  top=20mm, bottom=20mm,
+  left=30mm, right=15mm,
+  headheight=15pt
+  }
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{enumitem}
+\setlist[itemize]{
+  itemsep=0.0em, parsep=0pt,
+  topsep=0pt, partopsep=0pt
+  }
+\setlist[enumerate]{
+  itemsep=0.0em, parsep=0pt,
+  topsep=0pt, partopsep=0pt
+  }
+      
+\usepackage{caption}
+\captionsetup[figure]{name=Рисунок, labelsep=period}
+\captionsetup[table]{name=Таблица, labelsep=period}
+  
+\usepackage{titlesec}
+% Chapter: size (pt), centered, numbered inline.
+\titleformat{\chapter}[display]
+  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont} % <format>
+  {}                                        % <label> (empty → removes separate block)
+  {0pt}                                     % <sep>
+  {\thechapter.\quad} % <before-code>
+
+% Unnumbered chapters (\chapter*{...}).
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont}
+  {}
+  {0pt}
+  {}
+
+% Section and Subsection: 14pt, left-aligned, numbered.
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
+  {\thesection.}
+  {1em}
+  {}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
+  {\thesubsection.}
+  {1em}
+  {}
+
+
+\usepackage{titletoc}
 \addto\captionsrussian{\renewcommand{\contentsname}{Содержание}}
 \titlecontents{chapter}[0pt]
   {\vspace{0pt}\normalfont}
@@ -37,59 +84,6 @@
   {\titlerule*[1pc]{.}\contentspage}
   []
 
-\usepackage{comment}
-
-\usepackage{setspace}
-\onehalfspacing
-
-\usepackage{enumitem}
-\setlist[itemize]{
-  itemsep=0.0em, parsep=0pt,
-  topsep=0pt, partopsep=0pt
-}
-\setlist[enumerate]{
-  itemsep=0.0em, parsep=0pt,
-  topsep=0pt, partopsep=0pt
-}
-
-\usepackage{caption}
-\captionsetup[figure]{name=Рисунок, labelsep=period}
-\captionsetup[table]{name=Таблица, labelsep=period}
-
-% --- Page layout & spacing ---
-\usepackage{geometry}
-\geometry{
-  top=20mm, bottom=20mm,
-  left=30mm, right=15mm,
-  headheight=15pt
-}
-
-% Chapter: size (pt), centered, numbered inline.
-\titleformat{\chapter}[display]
-  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont} % <format>
-  {}                                        % <label> (empty → removes separate block)
-  {0pt}                                     % <sep>
-  {\thechapter{.}\quad} % <before-code>
-
-% Unnumbered chapters (\chapter*{...}).
-\titleformat{name=\chapter,numberless}[display]
-  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont}
-  {}
-  {0pt}
-  {}
-
-% Section and Subsection: 14pt, left-aligned, numbered.
-\titleformat{\section}
-  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {\thesection{.}}
-  {1em}
-  {}
-
-\titleformat{\subsection}
-  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {\thesubsection{.}}
-  {1em}
-  {}
 
 \makeatletter
 \newcommand{\cyralph}[1]{%
@@ -102,14 +96,14 @@
   \renewcommand{\thechapter}{\cyralph{\value{chapter}}}%
   \renewcommand{\theHchapter}{app\thechapter}%
   
-  % Safely override chapter TOC format for appendices
+  % Safely override chapter TOC format for appendices.
   \addtocontents{toc}{%
     \protect\titlecontents{chapter}[0pt]{\vspace{0pt}\normalfont}%
       {\protect\chaptername~\thecontentslabel.\quad}{}%
       {\protect\titlerule*[1pc]{.}\protect\contentspage}[]%
   }%
   
-  % Reset counters per appendix
+  % Reset counters per appendix.
   \counterwithin{section}{chapter}%
   \counterwithin{figure}{chapter}%
   \counterwithin{table}{chapter}%
@@ -122,7 +116,9 @@
     {\chaptername~\thechapter.\hspace{0.25em}}%
 }
 
-% --- Math & graphics ---
+% Utilities.
+\usepackage{float}
+\usepackage{comment}
 \usepackage{amsmath, amssymb, mathtools}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -131,11 +127,11 @@
 \usepackage{graphicx}
 \graphicspath{{images/}}
 
-% Bibliography (ГОСТ стиль).
+% Bibliography.
 \usepackage[style=gost-numeric, sorting=none, backend=biber]{biblatex}
 \addbibresource{references.bib}
 
-% --- Hyperlinks & bookmarks ---
+% Hyperlinks (MUST be last).
 \usepackage{hyperref}
 \hypersetup{
   colorlinks=true,
