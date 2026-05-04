@@ -1,0 +1,84 @@
+\section{Обучение модели}
+
+\subsection{Набор данных}
+
+Обучение модели выполнено на синтетическом наборе данных, сгенерированном под обучение разработанной архитектуры модели. Набор данных включает `Train', `Val' и `Test'-коллекций csv-таблиц частотных характеристик и json-файлов с координатами полюсов/нулей.
+
+Тренировочный набор данных состоит из 72 случайных комбинаций полюсов/нулей обобщенной модели линейного динамического звена:
+\begin{equation*}
+    H(s) = G \frac{\prod\limits_{m=1}^{M} \left(1 + \frac{s}{\omega_{\text{z}(m)}} \right)}{s^K \prod\limits_{n=1}^{N} \left(1 + \frac{s}{\omega_{\text{p}(n)}}\right)} e^{-s t_\text{delay}},
+\end{equation*}
+где
+\begin{itemize}
+    \item ${G}$ -- пропорциональный коэффициент, ${G \in \mathbb{R}}$;
+    \item ${t_\text{delay}}$ -- задержка времени, ${t_\text{delay}>0}$;
+    \item ${K}$ -- количество интеграторов, ${K \in \mathbb{N}}$;
+    \item ${\omega_{\text{z}(m)}}$ -- частоты нулей передаточной функции ${H(s)}$ в количестве ${M}$, ${\omega_{\text{z}(m)} \in \mathbb{R}}$;
+    \item ${\omega_{\text{p}(n)}}$ -- частоты полюсов передаточной функции ${H(s)}$ в количестве ${N}$, ${\omega_{\text{p}(n)} \in \mathbb{R}}$.
+\end{itemize}
+Каждой комбинации соответствует 500 значений, отличающихся диапазонами частот и частотами полюсов/нулей. Параметры ${G}$, ${t_\text{delay}}$ заданы константами для последующего изменения в ходе обучения. Общий размер тренировочного набора данных -- 72x500=36~000 примеров. Размеры валидационного и тестового наборов -- 14~400 и 7~200 примеров, соответственно.
+
+В тестовом наборе данных параметры ${G}$, ${t_\text{delay}}$ сгенерированы случайным образом; частотные характеристики приближены к реальным данным путем введения шума с нормальным распределением.
+
+Полное описание генератора набора данных приведено в репозитории \cite{gorbunov2026zerospolesmasks}.
+
+
+Аугментации в train.
+Чистый val.
+Шумный test.
+
+\subsection{Функция потерь}
+Обучение производилось путем минимизации комбинированной функции потерь
+\begin{equation*}
+    w^{\text{BCE}} \mathcal{L}^{\text{BCE}} + w^{\text{Dice}} \mathcal{L}^{\text{Dice}},
+\end{equation*}
+где
+\begin{itemize}
+    \item ${\mathcal{L}^{\text{BCE}}}$ -- перекрестная энтропия,
+    \item ${\mathcal{L}^{\text{Dice}}}$ -- функция потерь Дайса,
+    \item  ${w^{\text{BCE}}}$, ${w^{\text{Dice}}}$ -- весовые коэффициенты.
+\end{itemize}
+
+Перекрестная энтропия:
+\begin{equation}
+    \mathcal{L}^{\text{BCE}} = -\frac{1}{L} \sum_{i=1}^{L} \Big[ t_i \log\big(\sigma(z_i)\big) + (1-t_i) \log\big(1-\sigma(z_i)\big) \Big]
+\end{equation}
+
+Коэффициент Дайса дифференцируемый:
+\begin{equation}
+    \mathcal{L}^{\text{Dice}} = 1 - \frac{1}{B \cdot C} \sum_{b=1}^{B} \sum_{c=1}^{C} D_{b,c}.
+\end{equation}
+
+С целью более глубокого обучения полная функция рассчитывалась по каждому выходу $n$ декодера:
+\begin{equation*}
+    \mathcal{L} = \frac{1}{w} {\displaystyle\sum_{n=1}^{N} \Big[ w_n \Big( w^{\text{BCE}} \mathcal{L}_{n}^{\text{BCE}} + w^{\text{Dice}} \mathcal{L}_{n}^{\text{Dice}}} \Big) \Big],
+\end{equation*}
+$w$ -- сумма всех коэффициентов ${w_n}$.
+
+
+
+
+
+
+${\mathbf{t}}$ - Ground truth target tensor.
+
+
+
+${\mathcal{L}}$ - функция потерь (ошибки).
+
+\begin{equation*}
+    \mathcal{L} = \mathcal{L}_{\text{main}}(\mathbf{y}_{\text{main}}, \mathbf{t}) + \lambda \sum_{k=0}^{3} \mathcal{L}_{\text{ds}}^{(k)}(\mathbf{y}_{\text{ds}}^{(k)}, \mathbf{t}_{\downarrow^k})
+\end{equation*}
+где ${t}$ - ground truth at full resolution
+${\mathbf{t}_{\downarrow^k}}$ - downsampled ground truth matching ${\mathbf{y}_{\text{ds}}^{(k)}}$ resolution
+${\lambda}$ - weighting factor (e.g., 0.4, 0.3, 0.2, 0.1 for decreasing levels).
+
+\subsection{Метрики}
+
+\begin{equation}
+    D = \frac{2 \sum_{i=1}^{L} p_i \, t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i + \varepsilon}
+\end{equation}
+
+\begin{equation}
+    \text{IoU} = \frac{\displaystyle\sum_{i=1}^{L} p_i^{(\tau)} t_i}{\displaystyle\sum_{i=1}^{L} p_i^{(\tau)} + \sum_{i=1}^{L} t_i - \sum_{i=1}^{L} p_i^{(\tau)} t_i + \varepsilon}
+\end{equation}
