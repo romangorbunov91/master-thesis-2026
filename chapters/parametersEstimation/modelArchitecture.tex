@@ -11,11 +11,11 @@
 \begin{itemize}
     \item Кодирование в скрытое (латентное) пространство (CNN-энкодер):
         \begin{equation*}
-            \textbf{F}: \mathbb{R}^{F_1 \times L_1} \mapsto \mathbb{R}^{F_3 \times L_3}.
+            \textbf{F}: \mathbb{R}^{F_0 \times L} \mapsto \mathbb{R}^{F_3 \times L_3}.
         \end{equation*}
     \item Выделение наиболее информативных признаков в скрытом пространстве (bottleneck):
         \begin{equation*}
-            \textbf{H}: \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4}.
+            \textbf{H}: \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_3 \times L_3}.
         \end{equation*}
     \item Декодирование из скрытого пространства (CNN-декодер):
         \begin{equation*}
