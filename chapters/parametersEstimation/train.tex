@@ -22,11 +22,6 @@
 
 Полное описание генератора набора данных приведено в репозитории \cite{gorbunov2026zerospolesmasks}.
 
-
-Аугментации в train.
-Чистый val.
-Шумный test.
-
 \subsection{Функция потерь}
 Обучение производилось путем минимизации комбинированной функции потерь
 \begin{equation*}
@@ -40,45 +35,37 @@
 \end{itemize}
 
 Перекрестная энтропия:
+\begin{equation*}
+    \mathcal{L}^{\text{BCE}} = -\frac{1}{L} \sum_{i=1}^{L} \Big[ t_i \log\big(\sigma(d_i)\big) + (1-t_i) \log\big(1-\sigma(d_i)\big) \Big],
+\end{equation*}
+где ${t_i}$ -- ожидаемое значение (0 или 1), ${d_i}$ -- логиты с выхода декодера (логит). Логиты преобразуются в непрерывный диапазон ${[0; 1]}$ функцией
+\begin{equation*}
+    {\sigma(z) = \frac{1}{1 + e^{-z}}}.
+\end{equation*}
+
+Функция потерь Дайса:
 \begin{equation}
-    \mathcal{L}^{\text{BCE}} = -\frac{1}{L} \sum_{i=1}^{L} \Big[ t_i \log\big(\sigma(z_i)\big) + (1-t_i) \log\big(1-\sigma(z_i)\big) \Big]
+    \mathcal{L}^{\text{Dice}} = 1 - \frac{2 \sum_{i=1}^{L} d_i \, t_i}{\sum_{i=1}^{L} d_i + \sum_{i=1}^{L} t_i + \varepsilon}.
 \end{equation}
 
-Коэффициент Дайса дифференцируемый:
-\begin{equation}
-    \mathcal{L}^{\text{Dice}} = 1 - \frac{1}{B \cdot C} \sum_{b=1}^{B} \sum_{c=1}^{C} D_{b,c}.
-\end{equation}
-
-С целью более глубокого обучения полная функция рассчитывалась по каждому выходу $n$ декодера:
+С целью более глубокого обучения полная функция ошибки формируется по каждому выходу $n$ декодера:
 \begin{equation*}
     \mathcal{L} = \frac{1}{w} {\displaystyle\sum_{n=1}^{N} \Big[ w_n \Big( w^{\text{BCE}} \mathcal{L}_{n}^{\text{BCE}} + w^{\text{Dice}} \mathcal{L}_{n}^{\text{Dice}}} \Big) \Big],
 \end{equation*}
 $w$ -- сумма всех коэффициентов ${w_n}$.
 
-
-
-
-
-
-${\mathbf{t}}$ - Ground truth target tensor.
-
-
-
-${\mathcal{L}}$ - функция потерь (ошибки).
-
-\begin{equation*}
-    \mathcal{L} = \mathcal{L}_{\text{main}}(\mathbf{y}_{\text{main}}, \mathbf{t}) + \lambda \sum_{k=0}^{3} \mathcal{L}_{\text{ds}}^{(k)}(\mathbf{y}_{\text{ds}}^{(k)}, \mathbf{t}_{\downarrow^k})
-\end{equation*}
-где ${t}$ - ground truth at full resolution
-${\mathbf{t}_{\downarrow^k}}$ - downsampled ground truth matching ${\mathbf{y}_{\text{ds}}^{(k)}}$ resolution
-${\lambda}$ - weighting factor (e.g., 0.4, 0.3, 0.2, 0.1 for decreasing levels).
-
 \subsection{Метрики}
-
+Оценка качества работы модели производилась по коэффициенту Дайса:
 \begin{equation}
-    D = \frac{2 \sum_{i=1}^{L} p_i \, t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i + \varepsilon}
+    \text{Dice} = \frac{2 \sum_{i=1}^{L} p_i \, t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i + \varepsilon},
 \end{equation}
-
+где ${p_i}$ -- значения бинарной маски на выходе модели,
 \begin{equation}
-    \text{IoU} = \frac{\displaystyle\sum_{i=1}^{L} p_i^{(\tau)} t_i}{\displaystyle\sum_{i=1}^{L} p_i^{(\tau)} + \sum_{i=1}^{L} t_i - \sum_{i=1}^{L} p_i^{(\tau)} t_i + \varepsilon}
+    p_i = \mathbb{I}\!\left( \sigma \left( d_i \right) > 0,5 \right).
+\end{equation}
+где ${\mathbb{I}\left(\cdot\right)}$ -- индикаторная функция, принимающая значения \enquote{0} или \enquote{1}.
+
+В качестве вспомогательной метрики использовался коэффициент Жаккара:
+\begin{equation}
+    \text{IoU} = \frac{\sum_{i=1}^{L} p_i t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i - \sum_{i=1}^{L} p_i t_i + \varepsilon}
 \end{equation}

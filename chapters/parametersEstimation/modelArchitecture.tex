@@ -76,6 +76,7 @@
 \subsection{Bottleneck}
 Bottleneck реализован на основе трансформера.
 
+\begin{comment}
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/bottleneck_block_diagram.drawio.png}
@@ -83,6 +84,7 @@ Bottleneck реализован на основе трансформера.
 	\caption{Блок-схема bottleneck-алгоритма}
 	\label{fig: bottleneck_block_diagram}
 \end{figure}
+\end{comment}
 
 С выхода энкодера поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$. На входе Bottleneck длина тензора уменьшается до ${L_4}$, а количество каналов увеличивается до ${F_4}$:
 \begin{equation*}
@@ -144,15 +146,17 @@ ${m \in \{1, \dots, h\}}$.
 Регуляризация выполняется алгоритмом \enquote{nn.Dropout} после каждого Feed-Forward-слоя.
 
 \subsection{Декодер}
-Каждый слой декодера поднимает разрешение массива. Далее свертка, нормализация, активация.
+Каждый слой декодера увеличивает разрешение массива, последовательно приближая данные к маскам длины $L$.
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{x}_{\uparrow} &= \text{Upsample}(\mathbf{x}, \text{scale}=s, \text{mode=linear}) \\
-        \mathbf{z} &= \mathbf{W} \ast \mathbf{x}_{\uparrow} \\
+        \mathbf{x}_{\uparrow} &= \text{Upsample}(\mathbf{x}), \\
+        \mathbf{z} &= \mathbf{W} \ast \mathbf{x}_{\uparrow}, \\
         \mathbf{y} &= \sigma\left(\mathcal{N}(\mathbf{z})\right)
     \end{aligned}
 \end{equation*}
+
+Слои декодера связаны с соответствующими выходами энкодера посредством Attention-gated-связей, по аналогии с \cite{oktay2018attention}.
 
 \begin{comment}
     \begin{equation*}
@@ -174,7 +178,7 @@ ${m \in \{1, \dots, h\}}$.
         \mathbf{y}_{\text{ds}}^{(k)} &= \mathbf{W}_{\text{ds}}^{(k)} \ast \mathbf{d}_{k+1} \quad \text{(training only)}
     \end{aligned}
 \end{equation*}
-\end{comment}
+
 
 \subsection{Attention-Gated Skip Connections}
 
@@ -233,3 +237,5 @@ ${\text{cat}(\cdot,\cdot)}$ - слияние по каналам.
 ${\downarrow_s}$ - Downsampling by factor $s$ (e.g., MaxPool).
 
 ${\uparrow_s}$ - Upsampling by factor $s$ (linear interpolation).
+
+\end{comment}
