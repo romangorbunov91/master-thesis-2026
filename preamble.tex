@@ -64,23 +64,24 @@
 
 \usepackage{titletoc}
 \addto\captionsrussian{\renewcommand{\contentsname}{Содержание}}
+
 \titlecontents{chapter}[0pt]
   {\vspace{0pt}\normalfont}
-  {\thecontentslabel\hspace{1em}}
+  {\thecontentslabel.\hspace{0.25em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
 
-\titlecontents{section}[1.5em]
+\titlecontents{section}[1em]
   {\vspace{0pt}\normalfont}
-  {\thecontentslabel\hspace{1em}}
+  {\thecontentslabel.\hspace{0.2em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
 
-\titlecontents{subsection}[3.0em]
+\titlecontents{subsection}[2.5em]
   {\vspace{0pt}\normalfont}
-  {\thecontentslabel\hspace{1em}}
+  {\thecontentslabel.\hspace{0.2em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
@@ -97,6 +98,12 @@
   \renewcommand{\thechapter}{\cyralph{\value{chapter}}}%
   \renewcommand{\theHchapter}{app\thechapter}%
   
+  \titlecontents{chapter}[0pt]
+    {\vspace{0pt}\normalfont}
+    {Приложение~\thecontentslabel.\hspace{0.25em}}
+    {}
+    {\titlerule*[1pc]{.}\contentspage}
+    []%
   
   % Reset counters per appendix.
   \counterwithin{section}{chapter}%
