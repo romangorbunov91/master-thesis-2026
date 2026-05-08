@@ -31,8 +31,8 @@
   }
       
 \usepackage{caption}
-\captionsetup[figure]{name=Рисунок, labelsep=period}
-\captionsetup[table]{name=Таблица, labelsep=period}
+\captionsetup[figure]{name=Рисунок, labelsep=period, justification=centering, aboveskip=0pt, belowskip=0pt}
+\captionsetup[table]{name=Таблица, labelsep=period, justification=raggedright, singlelinecheck=off, aboveskip=0pt, belowskip=0pt}
   
 \usepackage{titlesec}
 % Chapter: size (pt), centered, numbered inline.
@@ -61,7 +61,6 @@
   {\thesubsection.}
   {1em}
   {}
-
 
 \usepackage{titletoc}
 \addto\captionsrussian{\renewcommand{\contentsname}{Содержание}}
