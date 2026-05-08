@@ -30,7 +30,7 @@
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/model_block_diagram.drawio.png}
 
 	\caption{Блок-схема архитектуры модели}
-	\label{fig: model_block_diagram}
+	\label{fig:model_block_diagram}
 \end{figure}
 
 \subsection{Энкодер}
@@ -41,7 +41,7 @@
 	\includegraphics [width=0.25\linewidth] {parametersEstimation/encoder_block_diagram.drawio.png}
 
 	\caption{Блок-схема базового блока энкодера}
-	\label{fig: encoder_block_diagram}
+	\label{fig:encoder_block_diagram}
 \end{figure}
 
 Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^1}$, ${\mathbf{W}_n^2}$, соответственно.
@@ -76,15 +76,13 @@
 \subsection{Bottleneck}
 Bottleneck реализован на основе трансформера.
 
-\begin{comment}
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/bottleneck_block_diagram.drawio.png}
 
 	\caption{Блок-схема bottleneck-алгоритма}
-	\label{fig: bottleneck_block_diagram}
+	\label{fig:bottleneck_block_diagram}
 \end{figure}
-\end{comment}
 
 С выхода энкодера поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$. На входе Bottleneck длина тензора уменьшается до ${L_4}$, а количество каналов увеличивается до ${F_4}$:
 \begin{equation*}

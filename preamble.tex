@@ -1,6 +1,7 @@
 % --- Russian support & typography ---
 \usepackage[T2A]{fontenc}      % Cyrillic font encoding
 \usepackage{tempora}   % Times New Roman for main text.
+\usepackage{amsmath, amssymb, mathtools}
 \usepackage{newtxmath}   % Times New Roman for math symbols.
 \usepackage{cmap}              % Makes Cyrillic text searchable/copyable in PDF
 \usepackage[russian]{babel}    % Russian hyphenation & captions
@@ -97,12 +98,6 @@
   \renewcommand{\thechapter}{\cyralph{\value{chapter}}}%
   \renewcommand{\theHchapter}{app\thechapter}%
   
-  % Safely override chapter TOC format for appendices.
-  \addtocontents{toc}{%
-    \protect\titlecontents{chapter}[0pt]{\vspace{0pt}\normalfont}%
-      {\protect\chaptername~\thecontentslabel.\quad}{}%
-      {\protect\titlerule*[1pc]{.}\protect\contentspage}[]%
-  }%
   
   % Reset counters per appendix.
   \counterwithin{section}{chapter}%
@@ -120,7 +115,6 @@
 % Utilities.
 \usepackage{float}
 \usepackage{comment}
-\usepackage{amsmath, amssymb, mathtools}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{threeparttable}

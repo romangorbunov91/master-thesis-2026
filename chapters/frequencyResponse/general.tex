@@ -1,13 +1,13 @@
 \section{Общие сведения}
 
-Рассматриваемая система аналого-цифрового преобразования и цифровой обработки сигналов с воздействием на объект управления посредством широтно-импульсной модуляции (рис.~\eqref{fig: discrete_time_system}).
+Рассматриваемая система аналого-цифрового преобразования и цифровой обработки сигналов с воздействием на объект управления посредством широтно-импульсной модуляции (рис.~\eqref{fig:discrete_time_system}).
 
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=0.85\linewidth] {frequencyResponse/discreteTimeSystem.drawio.png}
 
 	\caption{Рассматриваемая система}
-	\label{fig: discrete_time_system}
+	\label{fig:discrete_time_system}
 \end{figure}
 
 Операции выполняются циклически с постоянным периодом ${T_{d}}$, соответствующим базовой частоте дискретного регулирования ${f_{d} = 1 / T_{d}}$.
@@ -19,7 +19,7 @@
 Система преобразует континуальные сигналы ${x_{c}(t)}$, ${y_{c}(t)}$ в дискретные последовательности ${x[n]}$, ${y[n]}$.
 
 Преобразование осуществляется посредством дискретизации:
-\begin{equation}\label{eqn: sampleRule}
+\begin{equation}\label{eqn:sampleRule}
     \begin{split}
         &x[n] = x_{c} (n T_s), \\
         &y[n] = y_{c} (n T_s),
@@ -35,7 +35,7 @@
     \end{aligned}
 \end{equation*}
 определяются по $N$-последовательным отсчетам дискретных последовательностей ${x[n]}$, ${y[n]}$:
-\begin{equation}\label{eqn: DFT}
+\begin{equation}\label{eqn:DFT}
     \begin{aligned}
         &X\left[l\right] = \sum_{n=0}^{N - 1} {x\left[n\right] e^{-j\cfrac{2\pi}{N}nl}}, \\
         &Y\left[l\right] = \sum_{n=0}^{N - 1} {y\left[n\right] e^{-j\cfrac{2\pi}{N}nl}}.
@@ -70,13 +70,13 @@
 Каждому $k$-му измерению, ${k \in \left[1, K\right]}$, соответствует пара параметров $Z^{(k)}$, ${T^{(k)}_{z}}$, следовательно, и набор дискретных последовательностей ${x^{(k)}[n]}$, ${y^{(k)}[n]}$, ${z^{(k)}[n]}$, а также коэффициентов ${X^{(k)}\left[l\right]}$, ${Y^{(k)}\left[l\right]}$.
 
 Под частотной характеристикой понимается набор пар значений ${f^{(k)}_{z}}$, ${W^{(k)}}$, где в каждом $k$-ом измерении
-\begin{equation}\label{eqn: complexFreqResp}
+\begin{equation}\label{eqn:complexFreqResp}
     W^{(k)} = \cfrac{Y^{(k)}\left[L^{(k)}\right]}{X^{(k)}\left[L^{(k)}\right]} = \left| W^{(k)} \right| e^{j \angle W^{(k)}},
 \end{equation}
 ${L^{(k)} = {T^{(k)}_{h}} / {T^{(k)}_{z}}}$.
 
 Пары значений ${f^{(k)}_{z}}$, ${\left| W^{(k)} \right|}$ и ${f^{(k)}_{z}}$, ${\angle W^{(k)}}$ образуют амплитудно-частотную и фазо-частотную характеристики, соответственно.
-\begin{equation}\label{eqn: abs_angleFreqResp}
+\begin{equation}\label{eqn:abs_angleFreqResp}
     \begin{aligned}
         &\left| W^{(k)} \right| = \cfrac{\left| Y^{(k)}\left[L^{(k)}\right] \right| }{ \left| X^{(k)}\left[L^{(k)}\right] \right|}, \\
         &\angle W^{(k)} = \angle Y^{(k)}\left[L^{(k)}\right] - \angle X^{(k)}\left[L^{(k)}\right].
