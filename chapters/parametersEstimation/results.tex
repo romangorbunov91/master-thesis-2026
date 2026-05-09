@@ -1,49 +1,6 @@
-\section{Результаты}
+\section{Результаты измерений}
 
-Обучение модели выполнялось по лучшему коэффициенту Дайса на валидации (см. раздел~\ref{tbl:dice_iou}). Весовые коэффициенты функции ошибки: ${w^{\text{BCE}}=0.25}$, ${w^{\text{Dice}}=0.75}$.
-
-\begin{table}[htbp]
-    \caption{Метрики результирующие}
-    \label{tbl:dice_iou}
-    \begin{threeparttable}
-        \begin{tabular}{|l|l|l|l|l|}
-            \hline
-                    &                & \textbf{Dice} & \textbf{IoU} & \textbf{Комментарий}                                  \\ \hline
-            \textbf{1} & \textbf{Train} & 0.9092        & 0.8580       & Случайные аугментации: $G$, ${t_\text{delay}}$, шумы. \\ \hline
-            \textbf{2} & \textbf{Val}   & 0.9393        & 0.9030       & Нет аугментаций.\tnote{*}                                  \\ \hline
-            \textbf{3} & \textbf{Test}  & 0.9221        & 0.8774       & Нет аугментаций.\tnote{**}                                  \\ \hline
-        \end{tabular}
-        \begin{tablenotes}
-            \small
-            \item[*] Набор данных изначально сформирован с разными $G$, ${t_\text{delay}}$.
-            \item[**] Набор данных изначально сформирован с шумами и разными $G$, ${t_\text{delay}}$.
-        \end{tablenotes}
-    \end{threeparttable}
-\end{table}
-
-Результаты инференса случайных примеров из тестового набора данных %(\ref{fig:TS1}, \ref{fig:TS2}).
-
-\begin{comment}
-    
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/test_sample_1.png}
-
-	\caption{Результаты детекции полюсов/нулей}
-	\label{fig:TS1}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/test_sample_2.png}
-
-	\caption{Результаты детекции полюсов/нулей}
-	\label{fig:TS2}
-\end{figure}
-
-\end{comment}
-
-Проведен эксперимент на лабораторном стенде (приложение~\ref{appendix:bench}). Внутрисхемно измерена частотная характеристика цифрового звена
+Проведен эксперимент на лабораторном стенде (Приложение~\ref{appendix:bench}). Внутрисхемно измерена частотная характеристика цифрового звена
 \begin{equation*}
     H(z) = \frac{\alpha}{1 - (1-\alpha)z^{-1}},
 \end{equation*}
