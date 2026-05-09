@@ -38,7 +38,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=0.25\linewidth] {parametersEstimation/encoder_block_diagram.drawio.png}
+	\includegraphics [width=0.5\linewidth] {parametersEstimation/encoder_block_diagram.drawio.png}
 
 	\caption{Блок-схема базового блока энкодера}
 	\label{fig:encoder_block_diagram}
@@ -125,9 +125,9 @@ ${m \in \{1, \dots, h\}}$.
     \mathbf{b}_\text{attn} = \mathbf{b}_\text{in} \oplus \mathbf{MH}.
 \end{equation*}
 
-После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (Multi-Layer Perceptron, MLP). Реализованы два Feed-Forward-слоя с промежуточным увеличением скрытого пространства в $r$-раз:
+После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (Multi-Layer Perceptron, MLP). Реализованы два Feed-Forward-слоя поканальной обработки с промежуточным увеличением скрытого пространства в $r$-раз:
 \begin{equation*}
-    \mathbf{MLP} = \text{Dropout}\left(\mathbf{W}^\text{MLP2} \cdot \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}\left( \mathbf{b}_\text{attn} \right)\right)\right),
+    \mathbf{MLP} = \mathbf{W}^\text{MLP2} \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}\left( \mathbf{b}_\text{attn} \right)\right),
 \end{equation*}
 \begin{equation*}
     \mathbf{b}_\text{out} = \mathbf{b}_\text{attn} \oplus \mathbf{MLP},
@@ -139,7 +139,7 @@ ${m \in \{1, \dots, h\}}$.
         \mathbf{W}^{\text{MLP2}} &\in \mathbb{R}^{F_4 \times (r \cdot F_4)},
     \end{aligned} &
 \end{flalign*}
-где $r$ -- кратность масштабирования скрытого пространства в MLP-алгоритме.
+где ${r>1}$ -- кратность масштабирования скрытого пространства в MLP-алгоритме.
 
 Регуляризация выполняется алгоритмом \enquote{nn.Dropout} после каждого Feed-Forward-слоя.
 
