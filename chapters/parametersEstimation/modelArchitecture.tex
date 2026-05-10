@@ -33,17 +33,17 @@
 	\label{fig:model_block_diagram}
 \end{figure}
 
-Количество обучаемых параметров модели \~5M.
+Количество обучаемых параметров модели порядка 5M.
 
 \subsection{Энкодер}
 Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена residual-архитектура базового блока по типу \enquote{pre-activation}.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/encoder_block_diagram.drawio.png}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/residual_conv_diagram.drawio.png}
 
 	\caption{Блок-схема базового блока энкодера/декодера}
-	\label{fig:encoder_block_diagram}
+	\label{fig:residual_conv_diagram}
 \end{figure}
 
 Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^1}$, ${\mathbf{W}_n^2}$, соответственно.
@@ -146,13 +146,13 @@ ${m \in \{1, \dots, h\}}$.
 Регуляризация выполняется алгоритмом \enquote{nn.Dropout} после каждого Feed-Forward-слоя.
 
 \subsection{Декодер}
-Каждый слой декодера увеличивает разрешение массива, последовательно приближая данные к маскам длины $L$.
+Каждый слой декодера увеличивает разрешение и число каналов тензора, последовательно приближая данные к маскам длины $L$. Применяются residual-архитектура базового блока, в точности повторяющая блок энкодера (рис.~\ref{fig:residual_conv_diagram}):
 
 \begin{equation*}
     \begin{aligned}
         \mathbf{x}_{\uparrow} &= \text{Upsample}(\mathbf{x}), \\
         \mathbf{z} &= \mathbf{W} \ast \mathbf{x}_{\uparrow}, \\
-        \mathbf{y} &= \sigma\left(\mathcal{N}(\mathbf{z})\right)
+        \mathbf{y} &= \sigma\left(\mathcal{N}(\mathbf{z})\right).
     \end{aligned}
 \end{equation*}
 
@@ -181,8 +181,6 @@ ${m \in \{1, \dots, h\}}$.
 
 
 \subsection{Attention-Gated Skip Connections}
-
-Фичи энкодера перед слиянием с фичами декодера взвешиваются. По аналогии с \cite{oktay2018attention}
 
 Допустим, из skip-connection выходит
 
