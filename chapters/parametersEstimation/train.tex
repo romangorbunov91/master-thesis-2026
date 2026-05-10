@@ -70,7 +70,7 @@ $w$ -- сумма всех коэффициентов ${w_n}$.
     \text{IoU} = \frac{\sum_{i=1}^{L} p_i t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i - \sum_{i=1}^{L} p_i t_i + \varepsilon}.
 \end{equation}
 
-Обучение выполнено на Nvidia GeForce RTX3600 (12~ГБ), Torch=2.6.0, CUDA=12.1, cuDNN=8.1.1.
+Обучение выполнено на NVIDIA GeForce RTX3060 (12~ГБ), torch=2.6.0, CUDA=12.6, cuDNN=9.5.1.
 Размер батча: 360. Решатель: \enquote{Adam}. Обучение модели выполнялось по лучшему коэффициенту Дайса на валидации (см. раздел~\ref{tbl:dice_iou}). Весовые коэффициенты функции ошибки: ${w^{\text{BCE}}=0,25}$, ${w^{\text{Dice}}=0,75}$.
 
 \begin{table}[htbp]
