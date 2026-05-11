@@ -32,12 +32,12 @@
     \begin{enumerate}
         \item Вычисляются всевозможные значения
             \begin{equation*}
-                L = \frac{M \cdot N}{R}
+                L = \left\lfloor \frac{M \cdot N}{R} \right\rfloor
             \end{equation*}
         для ${N \in \left[ N_\text{min}; N_\text{max} \right]}$, с округлением $L$ до 1 при ${L<1}$.
         \item Значения $L$ используются для вычисления всевозможных приближений к начальному значению коэффициента ${R}$:
             \begin{equation*}
-                R^{'} = \frac{M \cdot N}{\left\lfloor L \right\rfloor}.
+                R^{'} = \frac{M \cdot N}{L}.
             \end{equation*}
         \item Значения ${R^{'}}$ используются для вычисления всевозможных приближений к исходному значению частоты ${f_{z}}$:
             \begin{equation*}
