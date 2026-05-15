@@ -44,9 +44,9 @@
 \end{equation*}
 
 Функция потерь Дайса:
-\begin{equation}
+\begin{equation*}
     \mathcal{L}^{\text{Dice}} = 1 - \frac{2 \sum_{i=1}^{L} d_i \, t_i}{\sum_{i=1}^{L} d_i + \sum_{i=1}^{L} t_i + \varepsilon}.
-\end{equation}
+\end{equation*}
 
 С целью более глубокого обучения полная функция ошибки формируется по каждому выходу $n$ декодера:
 \begin{equation*}
@@ -55,20 +55,20 @@
 $w$ -- сумма всех коэффициентов ${w_n}$.
 
 \subsection{Метрики}
-Оценка качества работы модели производилась по коэффициенту Дайса:
-\begin{equation}
+Коэффициент Дайса:
+\begin{equation*}
     \text{Dice} = \frac{2 \sum_{i=1}^{L} p_i \, t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i + \varepsilon},
-\end{equation}
+\end{equation*}
 где ${p_i}$ -- значения бинарной маски на выходе модели,
-\begin{equation}
+\begin{equation*}
     p_i = \mathbb{I}\!\left( \sigma \left( d_i \right) > 0,5 \right).
-\end{equation}
+\end{equation*}
 где ${\mathbb{I}\left(\cdot\right)}$ -- индикаторная функция, принимающая значения \enquote{0} или \enquote{1}.
 
-В качестве вспомогательной метрики использовался коэффициент Жаккара:
-\begin{equation}
+Коэффициент Жаккара:
+\begin{equation*}
     \text{IoU} = \frac{\sum_{i=1}^{L} p_i t_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} t_i - \sum_{i=1}^{L} p_i t_i + \varepsilon}.
-\end{equation}
+\end{equation*}
 
 Обучение выполнено на NVIDIA GeForce RTX3060 (12~ГБ), torch=2.6.0, CUDA=12.6, cuDNN=9.5.1.
 Размер батча: 360. Решатель: \enquote{Adam}. Обучение модели выполнялось по лучшему коэффициенту Дайса на валидации (см. раздел~\ref{tbl:dice_iou}). Весовые коэффициенты функции ошибки: ${w^{\text{BCE}}=0,25}$, ${w^{\text{Dice}}=0,75}$.
