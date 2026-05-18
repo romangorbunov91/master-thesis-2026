@@ -1,29 +1,9 @@
 \section{Архитектура модели}
 
-Модель основана на автокодировщике, выполняющем преобразование ${C_{\text{in}}}$-канального тензора длиной ${L}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
+Модель основана на архитектуре энкодер-декодер (рис.~\ref{fig:model_block_diagram}), выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
 \begin{equation*}
-    \Gamma: \mathbb{R}^{C_{\text{in}} \times L} \mapsto \mathbb{R}^{C_{\text{out}} \times L}.
+    \textbf{Y}: \, \mathbb{R}^{C_{\text{in}} \times L} \mapsto \mathbb{R}^{C_{\text{out}} \times L}.
 \end{equation*}
-
-Выход представляет собой бинарную маску, каждый канал которой соответствует типу детектируемых объектов.
-
-Преобразование ${\Gamma}$ выполняется в 3 основных этапа:
-\begin{itemize}
-    \item Кодирование в скрытое (латентное) пространство (CNN-энкодер):
-        \begin{equation*}
-            \textbf{F}: \mathbb{R}^{F_0 \times L} \mapsto \mathbb{R}^{F_3 \times L_3}.
-        \end{equation*}
-    \item Выделение наиболее информативных признаков в скрытом пространстве (bottleneck):
-        \begin{equation*}
-            \textbf{H}: \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_3 \times L_3}.
-        \end{equation*}
-    \item Декодирование из скрытого пространства (CNN-декодер):
-        \begin{equation*}
-            \textbf{Y}: \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_1 \times L_1}.
-        \end{equation*}
-\end{itemize}
-
-На входе и выходе архитектуры имеются дополнительные сверточные слой (без нормализации и активации). В декодер проброшены attention gated-skip-связи.
 
 \begin{figure}[H]
 	\centering
@@ -33,7 +13,62 @@
 	\label{fig:model_block_diagram}
 \end{figure}
 
-Количество обучаемых параметров модели порядка 5M.
+Преобразование ${\textbf{Y}}$ выполняется в 3 основных этапа:
+\begin{itemize}
+    \item Кодирование в скрытое (латентное) пространство (CNN-энкодер):
+        \begin{equation*}
+            \textbf{E}: \, \mathbb{R}^{F_0 \times L} \mapsto \mathbb{R}^{F_3 \times L_3}.
+        \end{equation*}
+    \item Выделение наиболее информативных признаков в скрытом пространстве (\enquote{Bottleneck}):
+        \begin{equation*}
+            \textbf{T}: \, \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_4 \times L_4}.
+        \end{equation*}
+    \item Декодирование из скрытого пространства (CNN-декодер):
+        \begin{equation*}
+            \textbf{D}: \, \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_1 \times L_1}.
+        \end{equation*}
+\end{itemize}
+
+Операции свертки на входе и выходе модели служат для согласования числа каналов (линейная проекция):
+\begin{equation*}
+    \begin{aligned}
+        \mathbb{R}^{C_\text{in} \times L} &\mapsto \mathbb{R}^{F_0 \times L}, \\
+        \mathbb{R}^{F_1 \times L_1} &\mapsto \mathbb{R}^{C_\text{out} \times L}.
+    \end{aligned}
+\end{equation*}
+
+Аналогичную функцию проекции выполняет свертка на входе алгоритма \enquote{Attention} в \enquote{Bottleneck}, но уже с нормализацией и активацией:
+\begin{equation*}
+    \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4}.
+\end{equation*}
+
+Выходной тензор ${\mathbb{R}^{C_\text{out} \times L}}$ представляет собой логиты ${d_i}$, ${i \in \{1, 2, \dots, L\}}$, преобразуемые далее в вероятности
+\begin{equation*}
+    p_i = \sigma \left( d_i \right),
+\end{equation*}
+где
+\begin{equation*}
+    {\sigma \left( d_i \right) = \frac{1}{1 + e^{-d_i}}},
+\end{equation*}
+затем в бинарные маски
+\begin{equation*}
+    m_i = \mathbb{I}\!\left( p_i > \tau \right),
+\end{equation*}
+где ${\forall i \colon m_i \in \{0, 1\}}$,
+\begin{equation*}
+    \mathbb{I}(p_i \geq \tau) = 
+        \begin{cases}
+            1, & p_i \geq \tau, \\
+            0, & p_i < \tau,
+        \end{cases}
+\end{equation*}
+${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
+
+Каждый канал маски соответствует типу детектируемых объектов.
+
+В декодер проброшены attention gated-skip-связи.
+
+Количество обучаемых параметров модели -- порядка 5M.
 
 \subsection{Энкодер}
 Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена residual-архитектура базового блока по типу \enquote{pre-activation}.
@@ -42,7 +77,7 @@
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/residual_conv_diagram.drawio.png}
 
-	\caption{Блок-схема базового блока энкодера/декодера}
+	\caption{Блок-схема базового блока свертки в энкодере и декодере}
 	\label{fig:residual_conv_diagram}
 \end{figure}
 
