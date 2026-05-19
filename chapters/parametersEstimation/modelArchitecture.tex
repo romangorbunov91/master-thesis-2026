@@ -1,8 +1,8 @@
 \section{Архитектура модели}
 
-Модель основана на архитектуре энкодер-декодер (рис.~\ref{fig:model_block_diagram}), выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
+Модель основана на архитектуре энкодер-декодер (рис.~\ref{fig:model_block_diagram}), выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
 \begin{equation*}
-    \textbf{Y}: \, \mathbb{R}^{C_{\text{in}} \times L} \mapsto \mathbb{R}^{C_{\text{out}} \times L}.
+    \textbf{Y}: \, \mathbb{R}^{C_{\text{in}} \times L_1} \mapsto \mathbb{R}^{C_{\text{out}} \times L_1}.
 \end{equation*}
 
 \begin{figure}[H]
@@ -17,7 +17,7 @@
 \begin{itemize}
     \item Кодирование в скрытое (латентное) пространство (CNN-энкодер):
         \begin{equation*}
-            \textbf{E}: \, \mathbb{R}^{F_0 \times L} \mapsto \mathbb{R}^{F_3 \times L_3}.
+            \textbf{E}: \, \mathbb{R}^{F_0 \times L_1} \mapsto \mathbb{R}^{F_3 \times L_3}.
         \end{equation*}
     \item Выделение наиболее информативных признаков в скрытом пространстве (\enquote{Bottleneck}):
         \begin{equation*}
@@ -32,8 +32,8 @@
 Операции свертки на входе и выходе модели служат для согласования числа каналов (линейная проекция):
 \begin{equation*}
     \begin{aligned}
-        \mathbb{R}^{C_\text{in} \times L} &\mapsto \mathbb{R}^{F_0 \times L}, \\
-        \mathbb{R}^{F_1 \times L_1} &\mapsto \mathbb{R}^{C_\text{out} \times L}.
+        \mathbb{R}^{C_\text{in} \times L_1} &\mapsto \mathbb{R}^{F_0 \times L_1}, \\
+        \mathbb{R}^{F_0 \times L_1} &\mapsto \mathbb{R}^{C_\text{out} \times L_1}.
     \end{aligned}
 \end{equation*}
 
@@ -42,7 +42,7 @@
     \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4}.
 \end{equation*}
 
-Выходной тензор ${\mathbb{R}^{C_\text{out} \times L}}$ представляет собой логиты ${d_i}$, ${i \in \{1, 2, \dots, L\}}$, преобразуемые далее в вероятности
+Выходной тензор ${\mathbb{R}^{C_\text{out} \times L_1}}$ представляет собой логиты ${d_i}$, ${i \in \{1, 2, \dots, L_1\}}$, преобразуемые сначала в вероятности
 \begin{equation*}
     p_i = \sigma \left( d_i \right),
 \end{equation*}
@@ -66,12 +66,10 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 
 Каждый канал маски соответствует типу детектируемых объектов.
 
-В декодер проброшены attention gated-skip-связи.
-
-Количество обучаемых параметров модели -- порядка 5M.
+Количество обучаемых параметров построенной модели составляет порядка \num{5.2}~M.
 
 \subsection{Энкодер}
-Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена residual-архитектура базового блока по типу \enquote{pre-activation}.
+Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation}.
 
 \begin{figure}[H]
 	\centering
@@ -81,26 +79,26 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 	\label{fig:residual_conv_diagram}
 \end{figure}
 
-Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^1}$, ${\mathbf{W}_n^2}$, соответственно.
+Каждый $n$-й базовы блок, ${n \in \{1, 2, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}}}$, ${\mathbf{W}_n^{2\text{enc}}}$, соответственно.
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{z}_n^1 &= \mathbf{W}_n^1 \ast \sigma\left(\mathcal{N}\left(\mathbf{e}_{n-1}\right)\right), \\
-        \mathbf{z}_n^2 &= \mathbf{W}_n^2 \ast \sigma\left(\mathcal{N}\left(\mathbf{z}_n^1\right)\right), \\
-        \mathbf{x}_{n} &= \mathbf{z}_n^2 \oplus \mathbf{s_n},
+        \mathbf{z}_n^{\text{enc}1} &= \mathbf{W}_n^{1\text{enc}} \ast \sigma\left(\mathcal{N}_n^{1\text{enc}}\left(\mathbf{e}_{n-1}\right)\right), \\
+        \mathbf{z}_n^{2\text{enc}} &= \mathbf{W}_n^{2\text{enc}} \ast \sigma\left(\mathcal{N}_n^{2\text{enc}}\left(\mathbf{z}_n^1\right)\right), \\
+        \mathbf{e}_{n} &= \mathbf{z}_n^{2\text{enc}} \oplus \mathbf{s}_n^\text{enc},
     \end{aligned}
 \end{equation*}
-где ${\ast}$ -- операция свертки, ${\oplus}$ -- поэлементная сумма.
+где ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n}}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n}}$, \enquote{${\ast}$} -- операция свертки, \enquote{${\oplus}$} -- поэлементная сумма.
 
-Сквозная связь \enquote{вход-выход} $\mathbf{s_n}$ (skip-connection) базового слоя приводится к числу каналов (фичей) на выходе (при необходимости):
+Сквозная связь \enquote{вход-выход} (\enquote{skip-connection}) ${\mathbf{s}_n^\text{enc}}$ базового блока приводится к числу каналов (\enquote{фичей}) на выходе (при необходимости):
 \begin{equation*}
-    \mathbf{s_n} = 
+    \mathbf{s}_n^\text{enc} = 
         \begin{cases} 
-            \mathbf{W}_n^s \ast \mathbf{e}_{n-1}, & \text{если} \quad F_{n-1} \neq F_{n} \\
+            \mathbf{W}_n^{\text{enc}} \ast \mathbf{e}_{n-1}, & \text{если} \hspace{0.33em} F_{n-1} \neq F_{n}, \\
             \mathbf{e}_{n-1}, & \text{иначе},
         \end{cases}
 \end{equation*}
-где ${\mathbf{W}_n^s \in \mathbb{R}^{F_{n} \times F_{n-1}}}$ -- ядро проекции.
+где ядро проекции ${\mathbf{W}_n^{\text{enc}} \in \mathbb{R}^{F_{n} \times F_{n-1}}}$.
 
 Между слоями энкодера выполняется уменьшение размерности тензор в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
 
@@ -108,7 +106,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
     \mathbf{e}_{n} \rightarrow \mathbf{e}_{n}{\downarrow_2}.
 \end{equation*}
 
-Таким образом, в энкодере выполняется последовательное увеличение числа каналов (фичей) с одновременным уменьшением размерности тензора. Residual-архитектура с pre-activation обеспечивают лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}. Регуляризация выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
+Таким образом, в энкодере выполняется последовательное увеличение числа каналов (\enquote{фичей}) с одновременным уменьшением размерности тензора. \enquote{Residual}-архитектура с \enquote{pre-activation} обеспечивают лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}. Регуляризация выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
 
 \subsection{Bottleneck}
 Bottleneck реализован на основе трансформера.
@@ -123,15 +121,15 @@ Bottleneck реализован на основе трансформера.
 
 С выхода энкодера поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$. На входе Bottleneck длина тензора уменьшается до ${L_4}$, а количество каналов увеличивается до ${F_4}$:
 \begin{equation*}
-    \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}\left(\mathbf{W}^P \ast \mathbf{e}_3{\downarrow}\right)\right),
+    \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}^3\left(\mathbf{W}^P \ast \mathbf{e}_3{\downarrow}\right)\right),
 \end{equation*}
 где ${\mathbf{W}^P \in \mathbb{R}^{F_4 \times F_3}}$, ${\mathbf{b}_\text{in} \in \mathbb{R}^{F_4 \times L_4}}$.
 
-На входе данные нормализуются (pre-normalization, \cite{xiong2020layer}), затем тензор преобразуется (permute) к формату ${L \times F}$
+На входе данные нормализуются (\enquote{pre-normalization}, \cite{xiong2020layer}), затем тензор преобразуется (permute) к формату ${L \times F}$
 \begin{equation*}
-    \mathbf{b}_\text{in} \rightarrow \mathcal{N}\left(\mathbf{b}_\text{in}\right) \rightarrow \mathbf{b}_\text{in.perm},
+    \mathbf{b}_\text{in} \rightarrow \mathcal{N}^4\left(\mathbf{b}_\text{in}\right) \rightarrow \mathbf{b}_\text{in.perm},
 \end{equation*}
-${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$, для совместимости с популярной реализацией алгоритма Multi-Head Self-Attention (MHSA, \cite{vaswani2017attention}):
+${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$, для совместимости с популярной реализацией алгоритма \enquote{Multi-Head Self-Attention} (MHSA, \cite{vaswani2017attention}):
 
 \begin{equation*}
     \begin{aligned}
@@ -150,7 +148,7 @@ ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$, для совме
 \end{flalign*}
 ${m \in \{1, \dots, h\}}$.
 
-Результаты вычисления $h$-\enquote{голов} алгоритма MHSA конкатенируются
+Результаты вычисления $h$-\enquote{голов} алгоритма MHSA объединяются в единый тензор
 \begin{equation*}
     \mathbf{MH}_\text{perm} = \text{Concat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O,
 \end{equation*}
@@ -162,9 +160,9 @@ ${m \in \{1, \dots, h\}}$.
     \mathbf{b}_\text{attn} = \mathbf{b}_\text{in} \oplus \mathbf{MH}.
 \end{equation*}
 
-После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (Multi-Layer Perceptron, MLP). Реализованы два Feed-Forward-слоя поканальной обработки с промежуточным увеличением скрытого пространства в $r$-раз:
+После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (Multi-Layer Perceptron, MLP). Реализованы два \enquote{Feed-Forward}-слоя поканальной обработки с промежуточным увеличением скрытого пространства в $r$-раз:
 \begin{equation*}
-    \mathbf{MLP} = \mathbf{W}^\text{MLP2} \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}\left( \mathbf{b}_\text{attn} \right)\right),
+    \mathbf{MLP} = \mathbf{W}^\text{MLP2} \sigma\left(\mathbf{W}^\text{MLP1} \mathcal{N}^5\left( \mathbf{b}_\text{attn} \right)\right),
 \end{equation*}
 \begin{equation*}
     \mathbf{b}_\text{out} = \mathbf{b}_\text{attn} \oplus \mathbf{MLP},
@@ -178,16 +176,28 @@ ${m \in \{1, \dots, h\}}$.
 \end{flalign*}
 где ${r>1}$ -- кратность масштабирования скрытого пространства в MLP-алгоритме.
 
-Регуляризация выполняется алгоритмом \enquote{nn.Dropout} после каждого Feed-Forward-слоя.
+Регуляризация выполняется алгоритмом \enquote{nn.Dropout} после каждого \enquote{Feed-Forward}-слоя.
 
 \subsection{Декодер}
-Каждый слой декодера увеличивает разрешение и число каналов тензора, последовательно приближая данные к маскам длины $L$. Применяются residual-архитектура базового блока, в точности повторяющая блок энкодера (рис.~\ref{fig:residual_conv_diagram}):
+Каждый слой декодера увеличивает разрешение и число каналов тензора, последовательно приближая данные к целевой длине ${L_1}$. Разрешение увеличивается в 2 раза алгоритмом \enquote{nn.Upsample}
+
+Между слоями энкодера выполняется уменьшение размерности тензор в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
+\begin{equation*}
+    \mathbf{d}_{n} \rightarrow \mathbf{d}_{n}{\uparrow_2}.
+\end{equation*}
+с последующей сверткой и нормализацией:
+\begin{equation*}
+    \mathbf{z}_{n}^{1\text{dec}} = \sigma\left(\mathcal{N}^{1\text{dec}}\left(\mathbf{W}^\text{dec} \ast \mathbf{d}_{{n}\uparrow_2}\right)\right),
+\end{equation*}
+где ${\mathbf{W}^\text{dec}} \in \mathbb{R}^{F_{n-1}/2 \times F_n}$
+
+Применяются \enquote{residual}-архитектура базового блока, в точности повторяющая блок энкодера (рис.~\ref{fig:residual_conv_diagram}):
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{x}_{\uparrow} &= \text{Upsample}(\mathbf{x}), \\
-        \mathbf{z} &= \mathbf{W} \ast \mathbf{x}_{\uparrow}, \\
-        \mathbf{y} &= \sigma\left(\mathcal{N}(\mathbf{z})\right).
+        \mathbf{z}_{n-1}^{2\text{dec}} &= \mathbf{W}_{n-1}^{1\text{dec}} \ast \sigma\left(\mathcal{N}\left(\mathbf{d}_{{n}\uparrow}\right)\right), \\
+        \mathbf{z}_{n-1}^{3\text{dec}} &= \mathbf{W}_{n-1}^{2\text{dec}} \ast \sigma\left(\mathcal{N}\left(\mathbf{z}_{n-1}^{2\text{dec}}\right)\right), \\
+        \mathbf{d}_{n-1} &= \mathbf{z}_{n-1}^{3\text{dec}} \oplus \mathbf{s}_{n-1}^\text{dec}.
     \end{aligned}
 \end{equation*}
 
