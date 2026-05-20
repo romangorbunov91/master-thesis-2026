@@ -33,11 +33,11 @@
 \begin{equation*}
     \begin{aligned}
         \mathbb{R}^{C_\text{in} \times L_1} &\mapsto \mathbb{R}^{F_0 \times L_1}, \\
-        \mathbb{R}^{F_0 \times L_1} &\mapsto \mathbb{R}^{C_\text{out} \times L_1}.
+        \mathbb{R}^{F_1 \times L_1} &\mapsto \mathbb{R}^{C_\text{out} \times L_1}.
     \end{aligned}
 \end{equation*}
 
-Аналогичную функцию проекции выполняет свертка на входе алгоритма \enquote{Attention} в \enquote{Bottleneck}, но уже с нормализацией и активацией:
+Аналогичную функцию проекции выполняет свертка на входе \enquote{Bottleneck}, но уже с нормализацией и активацией:
 \begin{equation*}
     \mathbb{R}^{F_3 \times L_4} \mapsto \mathbb{R}^{F_4 \times L_4}.
 \end{equation*}
@@ -61,7 +61,13 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 
 Каждый канал маски соответствует типу детектируемых объектов.
 
-Количество обучаемых параметров построенной модели составляет порядка \num{5.2}~M.
+Количество обучаемых параметров построенной модели составляет порядка \num{5.3}~M.
+
+Реализовано глубокое супервизирование (Deep Supervision) \cite{lee2015deeply} с целью более глубокого обучения слоев декодера:
+\begin{equation*}
+    \mathbf{d}'_n = \mathbf{W}_n^\text{DS} \ast \mathbf{d}_n,
+\end{equation*}
+где ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times 3}}$.
 
 \subsection{Энкодер}
 Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation} (рис.~\ref{fig:residual_conv_diagram}), обеспечивающая лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}.
@@ -74,7 +80,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 	\label{fig:residual_conv_diagram}
 \end{figure}
 
-Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n}}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n}}$, соответственно:
+Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n} \times 3}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n} \times 3}$, соответственно:
 
 \begin{equation*}
     \begin{aligned}
@@ -93,7 +99,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
             \mathbf{e}_{n-1}, & \text{иначе},
         \end{cases}
 \end{equation*}
-где ядро проекции ${\mathbf{W}_n^{\text{enc}} \in \mathbb{R}^{F_{n} \times F_{n-1}}}$.
+где ядро проекции ${\mathbf{W}_n^{\text{enc}} \in \mathbb{R}^{F_{n} \times F_{n-1}} \times 3}$.
 
 Между слоями энкодера длина тензора уменьшается в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
 \begin{equation*}
@@ -178,29 +184,30 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается
 
 \begin{equation*}
     \begin{aligned}
-        \mathbf{z}_{n-1}^{1\text{dec}} &= \mathbf{W}_{n-1}^{1\text{dec}} \ast \sigma\left(\mathcal{N}^{1\text{dec}}\left(\tilde{\mathbf{d}}_{n}\right)\right), \\
-        \mathbf{z}_{n-1}^{2\text{dec}} &= \mathbf{W}_{n-1}^{2\text{dec}} \ast \sigma\left(\mathcal{N}^{2\text{dec}}\left(\mathbf{z}_{n-1}^{1\text{dec}}\right)\right), \\
-        \mathbf{d}_{n-1} &= \mathbf{z}_{n-1}^{2\text{dec}} \oplus \mathbf{s}_{n-1}^\text{dec},
+        \mathbf{z}_n^{1\text{dec}} &= \mathbf{W}_n^{1\text{dec}} \ast \sigma\left(\mathcal{N}^{1\text{dec}}\left(\tilde{\mathbf{d}}_{n}\right)\right), \\
+        \mathbf{z}_n^{2\text{dec}} &= \mathbf{W}_n^{2\text{dec}} \ast \sigma\left(\mathcal{N}^{2\text{dec}}\left(\mathbf{z}_n^{1\text{dec}}\right)\right), \\
+        \mathbf{d}_{n-1} &= \mathbf{z}_n^{2\text{dec}} \oplus \mathbf{s}_n^\text{dec},
     \end{aligned}
 \end{equation*}
-где две свертки с ядрами ${\mathbf{W}_n^{1\text{dec}} \in \mathbb{R}^{F_{n-1} \times 2F_{n-1}}}$, ${\mathbf{W}_n^{2\text{dec}} \in \mathbb{R}^{F_{n-1} \times F_{n-1}}}$.
+где две свертки с ядрами ${\mathbf{W}_n^{1\text{dec}} \in \mathbb{R}^{F_n \times 2F_n}}$, ${\mathbf{W}_n^{2\text{dec}} \in \mathbb{R}^{F_n \times F_n}}$.
 
-В отличие от энкодера, входной тензор каждого слоя декодера ${\tilde{\mathbf{d}}_n}$ формируется слиянием каналов преобразованных тензоров энкодера ${\tilde{\mathbf{e}}_{n} \in \mathbb{R}^{F_{n-1} \times L_n}}$ и декодера ${\mathbf{g}_{n} \in \mathbb{R}^{F_{n-1} \times L_n}}$ соответствующих уровней:
+В отличие от энкодера, входной тензор каждого слоя декодера ${\tilde{\mathbf{d}}_n}$ формируется слиянием каналов преобразованных тензоров энкодера ${\tilde{\mathbf{e}}_n \in \mathbb{R}^{F_n \times L_n}}$ и декодера ${\mathbf{g}_n \in \mathbb{R}^{F_n \times L_n}}$ соответствующих уровней:
 \begin{equation*}
     \tilde{\mathbf{d}}_n = \text{cat}\left(\tilde{\mathbf{e}}_n, \mathbf{g}_n \right),
 \end{equation*}
-${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_{n-1} \times L_n}}$.
+${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$.
 
 Преобразование тензора декодера аналогично преобразованию на входе \enquote{bottleneck}, только с предварительным увеличением длины тензора в 2 раза алгоритмом \enquote{nn.Upsample}:
 \begin{equation*}
-    \mathbf{g}_n = \sigma\left(\mathcal{N}^{\text{dec}}\left(\mathbf{W}^{\text{dec}} \ast \mathbf{d}_{n}{\uparrow_2}\right)\right),
+    \mathbf{g}_n = \sigma\left(\mathcal{N}^{\text{dec}}\left(\mathbf{W}^{\text{dec}} \ast \mathbf{d}_{n+1}{\uparrow_2}\right)\right),
 \end{equation*}
-где ${\mathbf{W}^{\text{dec}}} \in \mathbb{R}^{F_{n-1} \times F_n}$.
+где ${\mathbf{W}^{\text{dec}}} \in \mathbb{R}^{F_n \times F_{n+1}}$.
 
-Тензор с входа уровня $n$ энкодера ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода ${\mathbf{e}_n}$ на тензор ${\mathbf{g}_n}$ алгоритмом \enquote{Attention}, по аналогии с \cite{oktay2018attention}:
+Тензор с входа уровня $n$ энкодера ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя энкодера ${\mathbf{e}_n}$ на соответствующий тензор ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right)}$:
 \begin{equation*}
     \tilde{\mathbf{e}}_n = \mathbf{e}_n \odot \boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right),
 \end{equation*}
+где ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) \in \mathbb{R}^{1 \times L_n}}$ представляет собой одноканальную карту признаков (карту \enquote{позиционного внимания}), формирующуюся алгоритмом \cite{oktay2018attention}:
 \begin{equation*}
     \boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) = \sigma_\text{Sigmoid} \left(\mathcal{N}^\psi \left( \mathbf{W}^\psi \ast \sigma_\text{ReLU} \left(\mathbf{E}_n \oplus \mathbf{G}_n \right) \right) \right),
 \end{equation*}
@@ -208,6 +215,8 @@ ${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_{n-1} \times L_n}}$.
     \mathbf{E}_n = \mathcal{N}^E\left(\mathbf{W}^E \ast \mathbf{e}_n\right), \quad 
     \mathbf{G}_n = \mathcal{N}^G\left(\mathbf{W}^G \ast \mathbf{g}_n\right),
 \end{equation*}
+\begin{equation*}
+    \mathbf{W}^E, \mathbf{W}^G \in \mathbb{R}^{F_n/2 \times F_n}, \quad 
+    \mathbf{W}^\psi \in \mathbb{R}^{1 \times F_n/2},
+\end{equation*}
 где \enquote{${\odot}$} -- операция поэлементного умножения.
-
-В декодере реализовано глубокое супервизирование (Deep Supervision) \cite{lee2015deeply} с целью более глубокого обучения модели.
