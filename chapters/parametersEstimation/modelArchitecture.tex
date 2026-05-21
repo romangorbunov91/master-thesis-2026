@@ -29,20 +29,30 @@
         \end{equation*}
 \end{itemize}
 
-Операции свертки на входе и выходе модели служат для согласования числа каналов (линейная проекция):
+Операция свертки на входе модели
+\begin{equation*}
+    \mathbb{R}^{C_\text{in} \times L_1} \mapsto \mathbb{R}^{F_0 \times L_1}
+\end{equation*}
+выполняет функцию предварительной фильтрации данных и имеет увеличенный размер ядра.
+
+Операция свертки на входе \enquote{Bottleneck} предназначена для проекции числа каналов
+\begin{equation*}
+    \mathbb{R}^{F_3 \times L_4} \mapsto \mathbb{R}^{F_4 \times L_4},
+\end{equation*}
+и включает в себя нормализацию и активацию.
+
+Операции свертки на выходе модели выполняют аналогичную функцию проекции числа каналов для согласования с количеством детектируемых объектов ${C_\text{out}}$, но уже без нормализации и активации:
 \begin{equation*}
     \begin{aligned}
-        \mathbb{R}^{C_\text{in} \times L_1} &\mapsto \mathbb{R}^{F_0 \times L_1}, \\
-        \mathbb{R}^{F_1 \times L_1} &\mapsto \mathbb{R}^{C_\text{out} \times L_1}.
+        \mathbf{d}_n \in \mathbb{R}^{F_n \times L_n} &\mapsto \mathbf{d}'_3 \in \mathbb{R}^{C_\text{out} \times L_n}, \\
+        \mathbf{d}'_n = & \mathbf{W}_n^\text{DS} \ast \mathbf{d}_n,
     \end{aligned}
 \end{equation*}
+где ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times KS}}$, ${KS}$ -- размер ядра свертки (\enquote{Kernel Size}). Выходные тензоры ${\mathbf{d}'_n}$ представляют собой логиты.
 
-Аналогичную функцию проекции выполняет свертка на входе \enquote{Bottleneck}, но уже с нормализацией и активацией:
-\begin{equation*}
-    \mathbb{R}^{F_3 \times L_4} \mapsto \mathbb{R}^{F_4 \times L_4}.
-\end{equation*}
+Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_2}$, ${\mathbf{d}'_3}$ используются только на этапе обучения модели с целью повысить глубину обучения.
 
-Выходной тензор ${\mathbb{R}^{C_\text{out} \times L_1}}$ представляет собой логиты ${d_i}$, ${i \in \{1, 2, \dots, L_1\}}$, преобразуемые сначала в вероятности ${p_i}$, затем в бинарные маски ${m_i}$:
+В режиме детекции логиты ${d_i}$, ${i \in \{1, 2, \dots, L_1\}}$ основного выхода модели ${\mathbf{d}'_1}$, преобразуются сначала в вероятности ${p_i}$, затем в бинарные маски ${m_i}$:
 \begin{equation*}
     \begin{aligned}
         p_i &= \frac{1}{1 + e^{-d_i}},\\
@@ -59,15 +69,9 @@
 \end{equation*}
 ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 
-Каждый канал маски соответствует типу детектируемых объектов.
+Каждый канал маски соответствует типу детектируемых объектов. 
 
 Количество обучаемых параметров построенной модели составляет порядка \num{5.3}~M.
-
-Реализовано глубокое супервизирование (Deep Supervision) \cite{lee2015deeply} с целью более глубокого обучения слоев декодера:
-\begin{equation*}
-    \mathbf{d}'_n = \mathbf{W}_n^\text{DS} \ast \mathbf{d}_n,
-\end{equation*}
-где ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times 3}}$.
 
 \subsection{Энкодер}
 Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation} (рис.~\ref{fig:residual_conv_diagram}), обеспечивающая лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}.
@@ -203,7 +207,7 @@ ${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$.
 \end{equation*}
 где ${\mathbf{W}^{\text{dec}}} \in \mathbb{R}^{F_n \times F_{n+1}}$.
 
-Тензор с входа уровня $n$ энкодера ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя энкодера ${\mathbf{e}_n}$ на соответствующий тензор ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right)}$:
+Тензор с входа уровня $n$ энкодера ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя энкодера ${\mathbf{e}_n}$ на соответствующий тензор ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right)}$ (рис.~\ref{fig:skip_conn_diagram}):
 \begin{equation*}
     \tilde{\mathbf{e}}_n = \mathbf{e}_n \odot \boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right),
 \end{equation*}
@@ -220,3 +224,11 @@ ${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$.
     \mathbf{W}^\psi \in \mathbb{R}^{1 \times F_n/2},
 \end{equation*}
 где \enquote{${\odot}$} -- операция поэлементного умножения.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=0.75\linewidth] {parametersEstimation/skip_conn_diagram.drawio.png}
+
+	\caption{Блок-схема \enquote{взвешенных} обходных связей энкодера с декодером}
+	\label{fig:skip_conn_diagram}
+\end{figure}
