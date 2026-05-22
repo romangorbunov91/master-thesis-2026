@@ -41,23 +41,20 @@
 \end{equation*}
 и включает в себя нормализацию и активацию.
 
-Операции свертки на выходе модели выполняют аналогичную функцию проекции числа каналов для согласования с количеством детектируемых объектов ${C_\text{out}}$, но уже без нормализации и активации:
+Операции свертки на выходе модели выполняют аналогичную функцию проекции числа каналов, но уже без нормализации и активации:
 \begin{equation*}
     \begin{aligned}
         \mathbf{d}_n \in \mathbb{R}^{F_n \times L_n} &\mapsto \mathbf{d}'_3 \in \mathbb{R}^{C_\text{out} \times L_n}, \\
         \mathbf{d}'_n = & \mathbf{W}_n^\text{DS} \ast \mathbf{d}_n,
     \end{aligned}
 \end{equation*}
-где ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times KS}}$, ${KS}$ -- размер ядра свертки (\enquote{Kernel Size}). Выходные тензоры ${\mathbf{d}'_n}$ представляют собой логиты.
+где \enquote{${\ast}$} -- операция свертки, ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times KS}}$, ${KS}$ -- размер ядра (\enquote{Kernel Size}). Количество каналов ${C_\text{out}}$ соответствует количеству детектируемых объектов. Выходные тензоры ${\mathbf{d}'_n}$ представляют собой логиты.
 
 Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_2}$, ${\mathbf{d}'_3}$ используются только на этапе обучения модели с целью повысить глубину обучения.
 
-В режиме детекции логиты ${d_i}$, ${i \in \{1, 2, \dots, L_1\}}$ основного выхода модели ${\mathbf{d}'_1}$, преобразуются сначала в вероятности ${p_i}$, затем в бинарные маски ${m_i}$:
+Выделение бинарных масок ${y_i}$, ${i \in \{1, \dots, L_1\}}$, осуществляется преобразованием логитов ${d_i}$ основного выхода модели ${\mathbf{d}'_1}$:
 \begin{equation*}
-    \begin{aligned}
-        p_i &= \frac{1}{1 + e^{-d_i}},\\
-        y_i &= \mathbb{I}\!\left( p_i > \tau \right),
-    \end{aligned}
+    d_i \quad \mapsto \quad p_i = \frac{1}{1 + e^{-d_i}} \quad \mapsto \quad y_i = \mathbb{I}\!\left( p_i > \tau \right),
 \end{equation*}
 где ${\forall i \colon y_i \in \{0, 1\}}$,
 \begin{equation*}
@@ -69,12 +66,10 @@
 \end{equation*}
 ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 
-Каждый канал маски соответствует типу детектируемых объектов. 
-
 Количество обучаемых параметров построенной модели составляет порядка \num{5.3}~M.
 
 \subsection{Энкодер}
-Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation} (рис.~\ref{fig:residual_conv_diagram}), обеспечивающая лучший градиентный поток для быстрой сходимости при обучении \cite{he2016identity}.
+Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation} (рис.~\ref{fig:residual_conv_diagram}), обеспечивающая улучшенный градиентный поток для ускорения сходимости при обучении \cite{he2016identity}.
 
 \begin{figure}[H]
 	\centering
@@ -84,7 +79,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 	\label{fig:residual_conv_diagram}
 \end{figure}
 
-Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n} \times 3}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n} \times 3}$, соответственно:
+Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n \times KS}}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n \times KS}}$, соответственно:
 
 \begin{equation*}
     \begin{aligned}
@@ -93,9 +88,9 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
         \mathbf{e}_{n} &= \mathbf{z}_n^{2\text{enc}} \oplus \mathbf{s}_n^\text{enc},
     \end{aligned}
 \end{equation*}
-где \enquote{${\ast}$} -- операция свертки, \enquote{${\oplus}$} -- поэлементная сумма.
+где \enquote{${\oplus}$} -- поэлементная сумма.
 
-Обходная связь (\enquote{skip-connection}) ${\mathbf{s}_n^\text{enc}}$ базового блока приводится к числу каналов (\enquote{фичей}) на выходе (при необходимости):
+Обходная связь (\enquote{skip-connection}) ${\mathbf{s}_n^\text{enc}}$ базового блока проецируется по числу каналов (\enquote{фичей}), при необходимости:
 \begin{equation*}
     \mathbf{s}_n^\text{enc} = 
         \begin{cases} 
@@ -103,7 +98,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
             \mathbf{e}_{n-1}, & \text{иначе},
         \end{cases}
 \end{equation*}
-где ядро проекции ${\mathbf{W}_n^{\text{enc}} \in \mathbb{R}^{F_{n} \times F_{n-1}} \times 3}$.
+где ядро проекции ${\mathbf{W}_n^{\text{enc}} \in \mathbb{R}^{F_{n} \times F_{n-1} \times KS}}$.
 
 Между слоями энкодера длина тензора уменьшается в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
 \begin{equation*}
@@ -115,13 +110,13 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 Таким образом, в энкодере выполняется последовательное увеличение числа каналов (\enquote{фичей}) с одновременным уменьшением длины тензора.
 
 \subsection{Bottleneck}
-\enquote{Bottleneck} реализован на основе трансформера (рис.~\ref{fig:bottleneck_block_diagram}), с предварительным преобразованием размерностей.
+\enquote{Bottleneck} реализован на основе трансформера (рис.~\ref{fig:bottleneck_block_diagram}), с предварительной проекцией числа каналов на входе.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/bottleneck_block_diagram.drawio.png}
 
-	\caption{Блок-схема bottleneck-алгоритма}
+	\caption{Блок-схема алгоритма \enquote{Bottleneck}}
 	\label{fig:bottleneck_block_diagram}
 \end{figure}
 
@@ -129,35 +124,36 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 \begin{equation*}
     \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}^P\left(\mathbf{W}^P \ast \mathbf{e}_3{\downarrow_2}\right)\right),
 \end{equation*}
-где ${\mathbf{W}^P \in \mathbb{R}^{F_4 \times F_3}}$, и к \enquote{permute}-формату ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$:
+где ${\mathbf{W}^P \in \mathbb{R}^{F_4 \times F_3 \times KS}}$, и к \enquote{permute}-формату ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$:
 \begin{equation*}
     \mathbf{b}_\text{in} \rightarrow \mathcal{N}^H\left(\mathbf{b}_\text{in}\right) \rightarrow \mathbf{b}_\text{in.perm}
 \end{equation*}
 для совместимости с популярной реализацией алгоритма \enquote{Multi-Head Self-Attention} (MHSA) \cite{vaswani2017attention}. Тензор разбивается на $h$-\enquote{голов} с количеством каналов ${d_{k}=F_4/h}$ в каждой голове. Результаты вычисления $h$-\enquote{голов}
 \begin{equation*}
-    \begin{aligned}
-        \mathbf{Q}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^Q, \\
-        \mathbf{K}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^K, \\
-        \mathbf{V}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^V, \\
-        \mathbf{H}_m &= \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m,
-    \end{aligned}
+    \mathbf{H}_m = \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m,
 \end{equation*}
-где ${m \in \{1, \dots, h\}}$,
-\begin{flalign*}
-    & \begin{aligned}
-        \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V &\in \mathbb{R}^{F_4 \times d_{k}}, \\
-        \mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m, \mathbf{H}_m &\in \mathbb{R}^{L_4 \times d_k},
-    \end{aligned} &
-\end{flalign*}
-объединяются в единый тензор
+${\mathbf{H}_m \in \mathbb{R}^{L_4 \times d_k}}$, ${m \in \{1, \dots, h\}}$, объединяются в единый тензор
 \begin{equation*}
     \mathbf{MH}_\text{perm} = \text{cat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O,
 \end{equation*}
-где \enquote{${\text{cat}(\cdot,...,\cdot)}$} -- операция слияния по каналам, ${\mathbf{W}^O \in \mathbb{R}^{F_4 \times F_4}}$.
+где \enquote{${\text{cat}(\cdot)}$} -- операция слияния по каналам, ${\mathbf{W}^O \in \mathbb{R}^{F_4 \times F_4}}$.
 
 ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается того же размера, что и ${\mathbf{b}_\text{in.perm}}$.
 
-Результирующий выход алгоритма MHSA формируется в виде суммы со входным тензором:
+Входные переменные алгоритма MHSA ${\mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m \in \mathbb{R}^{L_4 \times d_k}}$ формируются в результате линейной проекции входа
+\begin{equation*}
+    \begin{aligned}
+        \mathbf{Q}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^Q, \\
+        \mathbf{K}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^K, \\
+        \mathbf{V}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^V,
+    \end{aligned}
+\end{equation*}
+через соответствующие матрицы
+\begin{equation*}
+    \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V \in \mathbb{R}^{F_4 \times d_{k}}.
+\end{equation*}
+
+Результирующим выходом алгоритма MHSA является сумма полученного тензора со входным тензором:
 \begin{equation*}
     \mathbf{b}_\text{attn} = \mathbf{b}_\text{in} \oplus \mathbf{MH},
 \end{equation*}
@@ -174,15 +170,14 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается
 \begin{flalign*}
     & \begin{aligned}
         \mathbf{W}^{1\text{MLP}} &\in \mathbb{R}^{(r \cdot F_4) \times F_4}, \\
-        \mathbf{W}^{2\text{MLP}} &\in \mathbb{R}^{F_4 \times (r \cdot F_4)},
+        \mathbf{W}^{2\text{MLP}} &\in \mathbb{R}^{F_4 \times (r \cdot F_4)}.
     \end{aligned} &
 \end{flalign*}
-где ${r>1}$ -- кратность масштабирования скрытого пространства в MLP-алгоритме.
 
 Регуляризация во время обучения выполняется алгоритмом \enquote{nn.Dropout} после каждого \enquote{Feed-Forward}-слоя.
 
 \subsection{Декодер}
-Декодер последовательно приближает данные скрытого пространства к изначальнойдлине ${L_1}$ и числу каналов ${F_0}$.
+Декодер последовательно приближает данные скрытого пространства к изначальнойдлине ${L_1}$ и числу каналов ${F_1}$.
 
 \enquote{Residual}-архитектура базового блока декодера в точности повторяет блок энкодера (рис.~\ref{fig:residual_conv_diagram}):
 
@@ -193,25 +188,23 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается
         \mathbf{d}_{n-1} &= \mathbf{z}_n^{2\text{dec}} \oplus \mathbf{s}_n^\text{dec},
     \end{aligned}
 \end{equation*}
-где две свертки с ядрами ${\mathbf{W}_n^{1\text{dec}} \in \mathbb{R}^{F_n \times 2F_n}}$, ${\mathbf{W}_n^{2\text{dec}} \in \mathbb{R}^{F_n \times F_n}}$.
+где ${\mathbf{W}_n^{1\text{dec}} \in \mathbb{R}^{F_n \times 2F_n \times KS}}$, ${\mathbf{W}_n^{2\text{dec}} \in \mathbb{R}^{F_n \times F_n \times KS}}$.
 
-В отличие от энкодера, входной тензор каждого слоя декодера ${\tilde{\mathbf{d}}_n}$ формируется слиянием каналов преобразованных тензоров энкодера ${\tilde{\mathbf{e}}_n \in \mathbb{R}^{F_n \times L_n}}$ и декодера ${\mathbf{g}_n \in \mathbb{R}^{F_n \times L_n}}$ соответствующих уровней:
+В отличие от энкодера, входной тензор каждого слоя декодера ${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$ формируется слиянием каналов преобразованных тензоров энкодера ${\tilde{\mathbf{e}}_n \in \mathbb{R}^{F_n \times L_n}}$ и декодера ${\mathbf{g}_n \in \mathbb{R}^{F_n \times L_n}}$ соответствующих уровней:
 \begin{equation*}
-    \tilde{\mathbf{d}}_n = \text{cat}\left(\tilde{\mathbf{e}}_n, \mathbf{g}_n \right),
+    \tilde{\mathbf{d}}_n = \text{cat}\left(\tilde{\mathbf{e}}_n, \mathbf{g}_n \right).
 \end{equation*}
-${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$.
 
-Преобразование тензора декодера аналогично преобразованию на входе \enquote{bottleneck}, только с предварительным увеличением длины тензора в 2 раза алгоритмом \enquote{nn.Upsample}:
+Преобразование тензора декодера аналогично преобразованию, выполняемому на входе \enquote{Bottleneck}, только с предварительным увеличением длины тензора в 2 раза алгоритмом \enquote{nn.Upsample}:
 \begin{equation*}
     \mathbf{g}_n = \sigma\left(\mathcal{N}^{\text{dec}}\left(\mathbf{W}^{\text{dec}} \ast \mathbf{d}_{n+1}{\uparrow_2}\right)\right),
 \end{equation*}
-где ${\mathbf{W}^{\text{dec}}} \in \mathbb{R}^{F_n \times F_{n+1}}$.
+где ${\mathbf{W}^{\text{dec}}} \in \mathbb{R}^{F_n \times F_{n+1} \times KS}$.
 
-Тензор с входа уровня $n$ энкодера ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя энкодера ${\mathbf{e}_n}$ на соответствующий тензор ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right)}$ (рис.~\ref{fig:skip_conn_diagram}):
+Тензор ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя $n$ энкодера на соответствующую одноканальную карту признаков (карту \enquote{позиционного внимания}) ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) \in \mathbb{R}^{1 \times L_n}}$, формирующуюся алгоритмом \cite{oktay2018attention} (рис.~\ref{fig:skip_conn_diagram}):
 \begin{equation*}
     \tilde{\mathbf{e}}_n = \mathbf{e}_n \odot \boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right),
 \end{equation*}
-где ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) \in \mathbb{R}^{1 \times L_n}}$ представляет собой одноканальную карту признаков (карту \enquote{позиционного внимания}), формирующуюся алгоритмом \cite{oktay2018attention}:
 \begin{equation*}
     \boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) = \sigma_\text{Sigmoid} \left(\mathcal{N}^\psi \left( \mathbf{W}^\psi \ast \sigma_\text{ReLU} \left(\mathbf{E}_n \oplus \mathbf{G}_n \right) \right) \right),
 \end{equation*}
@@ -220,8 +213,8 @@ ${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$.
     \mathbf{G}_n = \mathcal{N}^G\left(\mathbf{W}^G \ast \mathbf{g}_n\right),
 \end{equation*}
 \begin{equation*}
-    \mathbf{W}^E, \mathbf{W}^G \in \mathbb{R}^{F_n/2 \times F_n}, \quad 
-    \mathbf{W}^\psi \in \mathbb{R}^{1 \times F_n/2},
+    \mathbf{W}^E, \mathbf{W}^G \in \mathbb{R}^{F_n/2 \times F_n \times KS}, \quad 
+    \mathbf{W}^\psi \in \mathbb{R}^{1 \times F_n/2 \times KS},
 \end{equation*}
 где \enquote{${\odot}$} -- операция поэлементного умножения.
 
@@ -229,6 +222,6 @@ ${\tilde{\mathbf{d}}_n \in \mathbb{R}^{2F_n \times L_n}}$.
 	\centering
 	\includegraphics [width=0.75\linewidth] {parametersEstimation/skip_conn_diagram.drawio.png}
 
-	\caption{Блок-схема \enquote{взвешенных} обходных связей энкодера с декодером}
+	\caption{Блок-схема \enquote{взвешивания} обходных связей}
 	\label{fig:skip_conn_diagram}
 \end{figure}
