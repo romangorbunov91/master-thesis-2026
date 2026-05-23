@@ -1,8 +1,12 @@
-\section{Результаты детекции}
+\section{Результаты инференса}
 \subsection{Результаты инференса случайных примеров из тестового набора данных}
 
+Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей %(рис.~\ref{fig:test_sample1}, \ref{fig:test_sample2}, \ref{fig:test_sample3}, \ref{fig:test_sample4}).
+
 \subsection{Результаты инференса данных эксперимента}
-Проведен эксперимент на лабораторном стенде (Приложение~\ref{appendix:bench}).
+
+Использовались как характеристики, измеренные внутрисхемно алгоритмом \ref{sec:fr_optim} в приложении \enquote{Digital Points} (приложение~\ref{appendix:application}), так и измеренные сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
+
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PI.pdf}
@@ -42,7 +46,6 @@
 	\caption{Результаты эксперимента}
 	\label{fig:ZoutI_detection}
 \end{figure}
-
 
 \begin{figure}[H]
 	\centering
