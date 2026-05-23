@@ -52,11 +52,11 @@
 
 Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_2}$, ${\mathbf{d}'_3}$ используются только на этапе обучения модели с целью повысить глубину обучения.
 
-Выделение бинарных масок ${y_i}$, ${i \in \{1, \dots, L_1\}}$, осуществляется преобразованием логитов ${d_i}$ основного выхода модели ${\mathbf{d}'_1}$:
-\begin{equation*}
-    d_i \quad \mapsto \quad p_i = \frac{1}{1 + e^{-d_i}} \quad \mapsto \quad y_i = \mathbb{I}\!\left( p_i > \tau \right),
-\end{equation*}
-где ${\forall i \colon y_i \in \{0, 1\}}$,
+Выделение бинарных масок ${\hat{y}_i}$, ${i \in \{1, \dots, L_1\}}$, осуществляется преобразованием логитов ${d_i}$ основного выхода модели ${\mathbf{d}'_1}$:
+\begin{equation}\label{eqn:logit2mask}
+    d_i \quad \mapsto \quad p_i = \frac{1}{1 + e^{-d_i}} \quad \mapsto \quad \hat{y}_i = \mathbb{I}\!\left( p_i > \tau \right),
+\end{equation}
+где ${\forall i \colon \hat{y}_i \in \{0, 1\}}$,
 \begin{equation*}
     \mathbb{I}(p_i \geq \tau) = 
         \begin{cases}
@@ -177,7 +177,7 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается
 Регуляризация во время обучения выполняется алгоритмом \enquote{nn.Dropout} после каждого \enquote{Feed-Forward}-слоя.
 
 \subsection{Декодер}
-Декодер последовательно приближает данные скрытого пространства к изначальнойдлине ${L_1}$ и числу каналов ${F_1}$.
+Декодер последовательно приближает данные скрытого пространства к изначальной длине ${L_1}$ и числу каналов ${F_1}$.
 
 \enquote{Residual}-архитектура базового блока декодера в точности повторяет блок энкодера (рис.~\ref{fig:residual_conv_diagram}):
 
