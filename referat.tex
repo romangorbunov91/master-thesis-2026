@@ -1,0 +1,198 @@
+\documentclass[a4paper, 14pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amssymb,amsmath,color}
+\usepackage{mathrsfs}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{sectsty}
+\usepackage{indentfirst}
+\usepackage{floatflt}
+\usepackage[14pt]{extsizes}
+\usepackage[export]{adjustbox}%управление выравниванием картинок
+
+\pagestyle{plain}
+\textheight = 25cm %703pt % высота текста
+\textwidth = 16cm %469pt % ширина текста
+\oddsidemargin = 0.3cm % отступ от левого края
+\evensidemargin = 0.3cm % отступ от левого края
+\topmargin = -1.5cm %-40pt % отступ от верхнего края
+
+\parindent=24pt % абзацный отступ
+\parskip=1pt % интервал между абзацами
+\tolerance=10000 % терпимость к "жидким" строкам
+\flushbottom % выравнивание высоты страниц
+\linespread{1.1}% межстрочный интервал
+
+\newtheorem{Df}{Опр.}
+\newtheorem{Ex}{Пример}
+\newtheorem{Nt}{Замечание}
+\newtheorem{Pb}{Задача}
+\newtheorem{Th}{Теорема}
+\newtheorem{Lm}{Лемма}
+\newtheorem{Ax}{Аксиома}
+
+\def\dd#1#2{\frac{\partial#1}{\partial#2}} %частные производные
+\def\grad{\operatorname{grad}} %градиент
+\def\rang{\operatorname{rang}} %ранг
+\def\sign{\operatorname{sign}} %сигнум
+\def\abs{\operatorname{abs}} % abs
+\def\rot{\operatorname{rot}} % ротор
+\def\div{\operatorname{div}} % дивергенция
+\def\R{\mathbb{R}} % пространство R.
+\def\Z{\mathbb{Z}} % пространство Z.
+\def\Q{\mathbb{Q}} % пространство Q.
+\def\N{\mathbb{N}} % пространство N.
+\def\C{\mathbb{C}} % пространство C.
+\def\inter{\operatorname{int}} %внутренность множества
+\def\intl{\int\limits} %интеграл, где область пишется под знаком интеграла
+
+\begin{document}
+    \thispagestyle{empty}	
+    \fontsize{14pt}{21pt}\selectfont
+
+    \vspace{20mm}
+
+    \hfill
+    \begin{minipage}[t][][t]{0.4\linewidth} % 0.4 -- доля относительно ширины документа
+        \hfill\text{УДК Вашей работы}
+    \end{minipage}
+
+    \vspace{30mm}
+    \begin{center}
+        {\large Горбунов Роман Леонидович}
+    \end{center}
+
+    \vspace{5mm}
+    \begin{center}
+        {\bf \large Алгоритмы внутрисхемного измерения частотных характеристик и идентификации параметров вторичных источников электропитания
+            \par}
+        
+        \vspace{10mm}
+        {%\small
+                Специальность 27.04.03 - Системный анализ и управление
+        }
+        
+        \vspace{10mm}
+        РЕФЕРАТ        
+        диссертации на соискание степени магистра
+    \end{center}
+
+    \vfill
+    \begin{center}
+        {Санкт-Петербург -- 2026}
+    \end{center}
+    
+    \newpage
+    
+    \fontsize{14pt}{14pt}\selectfont	
+    \noindent Работа выполнена на базе факультета информационных технологий и программирования в федеральном государственном автономном образовательном учреждении высшего образования «Национальный исследовательский университет ИТМО».
+    \vspace{3mm}\\
+    \textbf{Научный руководитель}:\\ 
+    кандидат физико-математических наук, доцент (квалификационная категория «ординарный доцент») ФГАОУ ВО «Национальный исследовательский университет ИТМО»\\ 
+    \textbf{Бабушкин Максим Владимирович}
+    \vspace{3mm}\\
+    \textbf{Рецензент}:\\ 
+    кандидат технических наук, звание, ведущий инженер-программист ООО «НТЦ ПРОТЕЙ»\\ 
+    \textbf{Калиновский Илья Андреевич}
+    \vspace{10mm}\\
+    Защита состоится 15~июня~2026~г. в 10:00 часов по адресу: г.~Санкт-Петербург, Ломоносова~9М, ауд.~1220
+    \vspace{20mm}\\
+    \noindent Реферат разослан 01~июня~2026~г.
+    \vspace{3mm}\\
+    \fontsize{14pt}{15pt}\selectfont Секретать ГЭК \hfill Матвеева Милена Вадиимовна
+
+    \newpage
+    \fontsize{14pt}{21pt}\selectfont
+
+    \begin{center}{
+        \bf ОБЩАЯ ХАРАКТЕРИСТИКА РАБОТЫ
+    }\end{center}
+
+    \noindent\textbf{Актуальность темы} \textit{Примерно 1-2 абзаца (полстраницы) об актуальности Вашего исследования }
+
+    \noindent\textbf{Цель работы} \textit{Четко сформулировать, какая цель и какие задачи. Обратите внимание, они должны быть согласованы с положениями, выносимыми на защиту, и с результатами и итогами работы.}
+
+    \noindent\textbf{Положения, выносимые на защиту:}
+    \begin{enumerate}
+        \item 	
+        \item 
+        \item
+    \end{enumerate}
+
+    \noindent\textbf{Достоверность и обоснованность полученных результатов} \textit{Расскажите, почему Вы считаете, что полученные Вами результаты достоверны, разработанные подходы корректны и тд. Примерно 1-2 абзаца (половину страницы)}
+
+    \noindent\textbf{Соответствие паспорту специальности.}
+    Работа соответствует паспорту специальности номре - «Название»: 
+    \textit{необходимо привести конретные пункты, по которым Ваша работа соответствует паспорту Вашей специальности}\\
+    \textbf{Например}\\
+    \textit{пункту 1 "Теория конденсированного состояния классических и квантовых, макроскопических и микроскопических систем. Изучение различных состояний вещества и физических явлений в них. Статистическая физика и кинетическая теория равновесных и неравновесных систем".
+    В ней развит теоретический подход для описания устойчивости магнитных состояний на наномасштабе при учете тепловых флуктуаций, существующих за счет взаимодействия системы с тепловым резервуаром. При этом удалось довести теоретический подход, основанный на теории переходного состояния для магнитных степеней свободы, до возможности интерпретации и объяснения реальных экспериментов.}
+
+    \noindent\textbf{Апробация работы}. Основные результаты работы докладывались
+    на семинарах \textit{перечислить, где и каких} и были представлены на следующих конференциях и семинарах:  
+    \begin{enumerate}
+        \item 
+        \item 
+        \item 
+        \item 
+        \item ...
+    \end{enumerate}
+        
+\noindent\textbf{Личный вклад автора}. \textit{Что сделали именно Вы, примерно один абзац}
+
+\begin{center}{
+        \bf КРАТКОЕ СОДЕРЖАНИЕ РАБОТЫ
+}\end{center}
+\noindent\textbf{Введение} \textit{Расскажите, что во введении, 3-4 строчки}
+
+    \noindent\textit{Нужно кратко рассказать, про каждую главу. Пожалуйста, добавьте ключевые графики и комментарии к ним, которые Вы приводите в презентации, и на которые хотите обратить внимание комиссии. Общий объем Реферата не должен превышать 8 страниц вместе с титульным листом} \par
+
+\noindent\textbf{Первая глава "Название 1 главы"} \textit{Кратко, о чем первая глава} \par
+
+\noindent\textbf{Вторая глава "Название 2 главы"} \textit{Кратко, о чем вторая глава} \par
+
+\textit{И так по всем главам} \par
+
+В заключении кратко подводятся полученные в диссертации результаты.
+
+    \noindent\textbf{Публикации по теме диссертации}
+\begin{itemize}
+    \item[[A1]] \textbf{Moskalenko M.A. Demagnetizing fields in chiral magnetic structures /
+    Moskalenko M.A., I. S. Lobanov, V. M. Uzdin // Nanosystems: Phys., Chem., Math - 2020, Vol. 4, No.11, pp. 401-407} (0,5 п.л./0,3 п.л) \textbf{WoS, BAK}
+
+    \item[[A1]] Горбунов~Р.Л., Севостьянов~Н.А. (науч. рук. Бабушкин М.В.) Алгоритм внутрисхемного измерения частотных характеристик встраиваемых систем управления // Сборник тезисов докладов конгресса молодых ученых. Электронное издание. – СПб: Университет ИТМО, 2024.
+    
+    \item[[A2]] Москаленко M.A. Природа температурной зависимости параметра анизотропии спиновых магнитных пружин/ Москаленко M.A., Уздин В.М., Йонссон Х. // Труды XVIII симпозиума "Нанофизика и наноэлектроника", Нижний Новгород, 10-14 марта 2014. Т. 1 С. 170-171. (0,125 п.л./ 0,1 п.л.)
+    \item[[A2]] Бабушкин~М.В., Горбунов~Р.Л. Идентификация параметров динамических звеньев встраиваемых систем управления // Сборник трудов II Всероссийской научно-практической конференции с международным участием “Искусственный интеллект: научные достижения и прикладные задачи”. – Ханты-Мансийск, 2026.
+\end{itemize}
+
+\begin{center}{
+        \bf СПИСОК ЦИТИРУЕМОЙ ЛИТЕРАТУРЫ
+}\end{center}
+\begin{itemize}\itemsep -5pt
+    \item[[1]] Fullerton, E. E. Exchange-spring behavior in epitaxial hard/soft magneticbilayers / Eric E. Fullerton, J.S. Jiang, M. Grimsditch et al. // Physical ReviewB. 1998. Vol. 58, no. 18. P. 12193
+    \item[[2]] Jiang, J. A new approach for improving exchange-spring magnets / J.S. Jiang,J.E. Pearson, Z.Y. Liu et al. // Journal of applied physics. 2005. Vol. 97,no. 10. P. 10K311
+    \item[[3]]  Uzdin,  V.  M.  Noncollinear  fe  spin  structure  in  (sm-co)/fe  exchange-spring   bilayers:   Layer-resolved $Fe^{75}$   mossbauer   spectroscopy   andelectronic structure calculations / V. M. Uzdin, A. Vega, A. Khrenovet  al.  //  Phys.  Rev. B. 2012. Jan. Vol.  85. P. 024409.
+    
+    \item[[4]] 	Lobanov I. S. Truncated minimum energy path method for finding first order
+    saddle points / S. Lobanov, I. N. Potkina, M. H. J´onsson, M. Uzdin, V.//
+    Nanosystems: physics, chemistry, mathematics. 2017. Vol. 8, no. 5. P. 586––595.
+    
+    \item[[5]] Bessarab P. F. Harmonic transition-state theory of thermal spin transitions /Pavel F Bessarab, Valery M Uzdin, Hannes Jonsson // Physical Review B. 2012. Vol. 85, no. 18. P. 184409
+    
+    \item[[6]] Radu, F. Perpendicular exchange bias in ferrimagnetic spin valves nat/
+    F. Radu, R. Abrudan, I. Radu et al. // Commun. 2012. Vol. 3. P. 1728.	
+\end{itemize}
+
+    \newpage
+\fontsize{14pt}{21pt}\selectfont
+
+\begin{center}{
+        \bf ПРИЛОЖЕНИЯ
+}\end{center}
+
+    \textit{Если у Вас есть какие-то схемы или что-то, что Вы хотели бы показать комиссии, пожалуйста, добавьте их (или ссылки на них) в этот раздел}
+	
+\end{document}
