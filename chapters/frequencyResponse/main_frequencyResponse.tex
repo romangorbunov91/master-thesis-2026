@@ -69,20 +69,19 @@
 
 Каждому $k$-му измерению, ${k \in \left[1, K\right]}$, соответствует пара параметров $Z^{(k)}$, ${T^{(k)}_{z}}$, следовательно, и набор дискретных последовательностей ${x^{(k)}[n]}$, ${y^{(k)}[n]}$, ${z^{(k)}[n]}$, а также коэффициентов ${X^{(k)}\left[l\right]}$, ${Y^{(k)}\left[l\right]}$.
 
-Под частотной характеристикой понимается набор $K$-пар значений ${f^{(k)}_{z}}$, ${W^{(k)}}$, где в каждом $k$-ом измерении
+Под частотной характеристикой понимается набор $K$-пар значений ${f^{(k)}_{z}}$, ${H^{(k)}}$, где в каждом $k$-ом измерении
 \begin{equation}\label{eqn:complexFreqResp}
-    W^{(k)} = \cfrac{Y^{(k)}\left[L^{(k)}\right]}{X^{(k)}\left[L^{(k)}\right]} = \left| W^{(k)} \right| e^{j \angle W^{(k)}},
+    H^{(k)} = \cfrac{Y^{(k)}\left[L^{(k)}\right]}{X^{(k)}\left[L^{(k)}\right]} = \left| H^{(k)} \right| e^{j \angle H^{(k)}},
 \end{equation}
 ${L^{(k)} = {T^{(k)}_{h}} / {T^{(k)}_{z}}}$.
 
-Пары значений ${f^{(k)}_{z}}$, ${\left| W^{(k)} \right|}$ и ${f^{(k)}_{z}}$, ${\angle W^{(k)}}$ образуют амплитудно-частотную и фазо-частотную характеристики, соответственно.
+Пары значений ${f^{(k)}_{z}}$, ${\left| H^{(k)} \right|}$ и ${f^{(k)}_{z}}$, ${\angle H^{(k)}}$ образуют амплитудно-частотную и фазо-частотную характеристики, соответственно.
 \begin{equation}\label{eqn:abs_angleFreqResp}
     \begin{aligned}
-        &\left| W^{(k)} \right| = \cfrac{\left| Y^{(k)}\left[L^{(k)}\right] \right| }{ \left| X^{(k)}\left[L^{(k)}\right] \right|}, \\
-        &\angle W^{(k)} = \angle Y^{(k)}\left[L^{(k)}\right] - \angle X^{(k)}\left[L^{(k)}\right].
+        &\left| H^{(k)} \right| = \cfrac{\left| Y^{(k)}\left[L^{(k)}\right] \right| }{ \left| X^{(k)}\left[L^{(k)}\right] \right|}, \\
+        &\angle H^{(k)} = \angle Y^{(k)}\left[L^{(k)}\right] - \angle X^{(k)}\left[L^{(k)}\right].
     \end{aligned}
 \end{equation}
-
 
 \input{chapters/frequencyResponse/N_var}
 \input{chapters/frequencyResponse/N_const}

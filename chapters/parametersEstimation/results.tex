@@ -4,14 +4,41 @@
 Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей %(рис.~\ref{fig:test_sample1}, \ref{fig:test_sample2}, \ref{fig:test_sample3}, \ref{fig:test_sample4}).
 
 \subsection{Результаты инференса данных эксперимента}
+По частотным характеристикам, измеренным в серии экспериментов, выполнена идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Инференс модели проведен как по характеристикам, измеренным внутрисхемно алгоритмом \ref{sec:fr_optim} (приложение~\ref{appendix:application}), так и измеренным сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
 
-Использовались как характеристики, измеренные внутрисхемно алгоритмом \ref{sec:fr_optim} в приложении \enquote{Digital Points} (приложение~\ref{appendix:application}), так и измеренные сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
+В теории, комплексный коэффициент передачи исследованных звеньев аппроксимируется следующими малосигнальными моделями:
+\begin{itemize}
+	\item ПИ-регулятор (рис.~\ref{fig:G_I_PI_detection}, \ref{fig:G_U_PI_detection}):\par
+	\begin{equation*}
+		H_\text{PI}(s) = G_\text{PI} \frac{1 + \frac{s}{\omega_\text{PI}}}{s},
+	\end{equation*}
+	где ${G_\text{PI}}$, ${\omega_\text{PI}}$ -- вещественные положительные числа.
+	\item ПИД-регулятор (рис.~\ref{fig:G_I_PID_detection}):\par
+	\begin{equation*}
+		H_\text{PID}(s) = G_\text{PID} \frac{\left(1 + \frac{s}{\omega_\text{PI}}\right) \cdot \left(1 + \frac{s}{\omega_\text{PD}}\right)}{s \left(1 + \frac{s}{\omega_p}\right)},
+	\end{equation*}
+	\item Коэффициент преобразования тока в напряжение (рис.~\ref{fig:Wui_detection}, \ref{fig:Wui_delay_detection}):\par
+	\begin{equation*}
+		H_\text{ui}(s) = \frac{R}{2} \cdot \frac{U_\text{in}}{U_\text{out}} \cdot \frac{\left(1 - \frac{s}{\omega_\text{RHP}} \right) \cdot \left(1 + \frac{s}{\omega_\text{ESR}} \right)}{\left(1 + \frac{s}{ \omega_{RC}} \right)} e^{-s t_\text{delay}},
+	\end{equation*}
+	где ${\omega_\text{RHP} = \frac{U_\text{in}^2}{U_\text{out}^2} \cdot \frac{R}{L}}$, ${\omega_\text{ESR} = \frac{1}{ESR \cdot C}}$, ${\omega_{RC} = \frac{2}{R \cdot C}}$.
+	\item Выходной импеданс выключенного источника питания (рис.~\ref{fig:Zout_detection}):\par
+	\begin{equation*}
+		H_\text{out}(s) = \frac{1}{C} \cdot \frac{1 + \frac{s}{\omega_\text{ESR}}}{s}.
+	\end{equation*}
+	\item Выходной импеданс источника питания в режиме стабилизации тока (рис.~\ref{fig:ZoutI_detection}):\par
+	\begin{equation*}
+		H_\text{out}^\text{I}(s) = \frac{R}{2} \cdot \frac{1 + \frac{s}{\omega_\text{ESR}}}{1 + \frac{s}{ \omega_{RC}}}.
+	\end{equation*}
+\end{itemize}
+
+Выбранные звенья презентабельно характеризуют модель, т.к. содержат левые и правые нули, полюса на нулевой частоте и без них, разное количество полюсов/нулей, задержка по времени и без нее.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PI.pdf}
 
-	\caption{Результаты эксперимента}
+	\caption{Частотные характеристики ПИ-регулятора контура регулирования тока (внутрисхемное измерение)}
 	\label{fig:G_I_PI_detection}
 \end{figure}
 
@@ -19,7 +46,7 @@
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_U_PI.pdf}
 
-	\caption{Результаты эксперимента}
+	\caption{Частотные характеристики ПИ-регулятора контура стабилизации напряжения (внутрисхемное измерение)}
 	\label{fig:G_U_PI_detection}
 \end{figure}
 
@@ -27,15 +54,31 @@
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PID.pdf}
 
-	\caption{Результаты эксперимента}
+	\caption{Частотные характеристики ПИД-регулятора контура регулирования тока (внутрисхемное измерение)}
 	\label{fig:G_I_PID_detection}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui.pdf}
+
+	\caption{Частотные характеристики коэффициента преобразования тока в напряжение (внутрисхемное измерение)}
+	\label{fig:Wui_detection}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui.pdf}
+
+	\caption{Частотные характеристики коэффициента преобразования тока в напряжение при введенной задержки времени (внутрисхемное измерение)}
+	\label{fig:Wui_delay_detection}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/Zout.pdf}
 
-	\caption{Результаты эксперимента}
+	\caption{Частотные характеристики выходного импеданса выключенного источника питания (измерение внешним анализатором)}
 	\label{fig:Zout_detection}
 \end{figure}
 
@@ -43,14 +86,6 @@
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/ZoutI.pdf}
 
-	\caption{Результаты эксперимента}
+	\caption{Частотные характеристики выходного импеданса источника питания в режиме стабилизации тока (измерение внешним анализатором)}
 	\label{fig:ZoutI_detection}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui.pdf}
-
-	\caption{Результаты эксперимента}
-	\label{fig:Wui_detection}
 \end{figure}
