@@ -1,6 +1,6 @@
 \section{Архитектура модели}
 
-Модель основана на архитектуре энкодер-декодер (рис.~\ref{fig:model_block_diagram}), выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
+Модель основана на архитектуре энкодер-декодер (рис.~\ref{fig:model_block_diagram}), состоящей из $N$-уровней и выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
 \begin{equation*}
     \textbf{Y}: \, \mathbb{R}^{C_{\text{in}} \times L_1} \mapsto \mathbb{R}^{C_{\text{out}} \times L_1}.
 \end{equation*}
@@ -17,15 +17,15 @@
 \begin{itemize}
     \item Кодирование в скрытое (латентное) пространство (CNN-энкодер):
         \begin{equation*}
-            \textbf{E}: \, \mathbb{R}^{F_0 \times L_1} \mapsto \mathbb{R}^{F_3 \times L_3}.
+            \textbf{E}: \, \mathbb{R}^{F_0 \times L_1} \mapsto \mathbb{R}^{F_N \times L_N}.
         \end{equation*}
     \item Выделение наиболее информативных признаков в скрытом пространстве (\enquote{Bottleneck}):
         \begin{equation*}
-            \textbf{T}: \, \mathbb{R}^{F_3 \times L_3} \mapsto \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_4 \times L_4}.
+            \textbf{T}: \, \mathbb{R}^{F_N \times L_N} \mapsto \mathbb{R}^{F_{N+1} \times L_{N+1}} \mapsto \mathbb{R}^{F_{N+1} \times L_{N+1}}.
         \end{equation*}
     \item Декодирование из скрытого пространства (CNN-декодер):
         \begin{equation*}
-            \textbf{D}: \, \mathbb{R}^{F_4 \times L_4} \mapsto \mathbb{R}^{F_1 \times L_1}.
+            \textbf{D}: \, \mathbb{R}^{F_{N+1} \times L_{N+1}} \mapsto \mathbb{R}^{F_1 \times L_1}.
         \end{equation*}
 \end{itemize}
 
@@ -37,20 +37,20 @@
 
 Операция свертки на входе \enquote{Bottleneck} предназначена для проекции числа каналов
 \begin{equation*}
-    \mathbb{R}^{F_3 \times L_4} \mapsto \mathbb{R}^{F_4 \times L_4},
+    \mathbb{R}^{F_N \times L_{N+1}} \mapsto \mathbb{R}^{F_{N+1} \times L_{N+1}},
 \end{equation*}
 и включает в себя нормализацию и активацию.
 
 Операции свертки на выходе модели выполняют аналогичную функцию проекции числа каналов, но уже без нормализации и активации:
 \begin{equation*}
     \begin{aligned}
-        \mathbf{d}_n \in \mathbb{R}^{F_n \times L_n} &\mapsto \mathbf{d}'_3 \in \mathbb{R}^{C_\text{out} \times L_n}, \\
+        \mathbf{d}_n \in \mathbb{R}^{F_n \times L_n} &\mapsto \mathbf{d}'_n \in \mathbb{R}^{C_\text{out} \times L_n}, \\
         \mathbf{d}'_n = & \mathbf{W}_n^\text{DS} \ast \mathbf{d}_n,
     \end{aligned}
 \end{equation*}
 где \enquote{${\ast}$} -- операция свертки, ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times KS}}$, ${KS}$ -- размер ядра (\enquote{Kernel Size}). Количество каналов ${C_\text{out}}$ соответствует количеству детектируемых объектов. Выходные тензоры ${\mathbf{d}'_n}$ представляют собой логиты.
 
-Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_2}$, ${\mathbf{d}'_3}$ используются только на этапе обучения модели с целью повысить глубину обучения.
+Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_n}$, ${n > 1}$, используются только на этапе обучения модели с целью повысить глубину обучения.
 
 Выделение бинарных масок ${\hat{y}_i}$, ${i \in \{1, \dots, L_1\}}$, осуществляется преобразованием логитов ${d_i}$ основного выхода модели ${\mathbf{d}'_1}$:
 \begin{equation}\label{eqn:logit2mask}
@@ -105,11 +105,11 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
     \mathbf{e}_{n} \rightarrow \mathbf{e}_{n}{\downarrow_2}.
 \end{equation*}
 
-Регуляризация во время обучения выполняется алгоритмом \enquote{nn.Dropout1d} на выходе второй свертки.
+Регуляризация во время обучения выполняется алгоритмом \enquote{nn.Dropout1d}, выполняемым на выходе второй свертки.
 
-Таким образом, в энкодере выполняется последовательное увеличение числа каналов (\enquote{фичей}) с одновременным уменьшением длины тензора.
+Таким образом, в энкодере производится последовательное увеличение числа каналов (\enquote{фичей}) с одновременным уменьшением длины тензора.
 
-\subsection{Bottleneck}
+\subsection{\enquote{Bottleneck}}
 \enquote{Bottleneck} реализован на основе трансформера (рис.~\ref{fig:bottleneck_block_diagram}), с предварительной проекцией числа каналов на входе.
 
 \begin{figure}[H]
@@ -120,27 +120,27 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 	\label{fig:bottleneck_block_diagram}
 \end{figure}
 
-На вход \enquote{bottleneck} поступает тензор ${\mathbf{e}_3 \in \mathbb{R}^{F_3 \times L_3}}$ с выхода энкодера. Тензор преобразуется к ${\mathbf{b}_\text{in} \in \mathbb{R}^{F_4 \times L_4}}$:
+На вход \enquote{bottleneck} поступает тензор ${\mathbf{e}_N \in \mathbb{R}^{F_N \times L_N}}$ с выхода энкодера. Тензор преобразуется к ${\mathbf{b}_\text{in} \in \mathbb{R}^{F_{N+1} \times L_{N+1}}}$:
 \begin{equation*}
     \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}^P\left(\mathbf{W}^P \ast \mathbf{e}_3{\downarrow_2}\right)\right),
 \end{equation*}
-где ${\mathbf{W}^P \in \mathbb{R}^{F_4 \times F_3 \times KS}}$, и к \enquote{permute}-формату ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_4 \times F_4}}$:
+где ${\mathbf{W}^P \in \mathbb{R}^{F_{N+1} \times F_N \times KS}}$, и к \enquote{permute}-формату ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$:
 \begin{equation*}
     \mathbf{b}_\text{in} \rightarrow \mathcal{N}^H\left(\mathbf{b}_\text{in}\right) \rightarrow \mathbf{b}_\text{in.perm}
 \end{equation*}
-для совместимости с популярной реализацией алгоритма \enquote{Multi-Head Self-Attention} (MHSA) \cite{vaswani2017attention}. Тензор разбивается на $h$-\enquote{голов} с количеством каналов ${d_{k}=F_4/h}$ в каждой голове. Результаты вычисления $h$-\enquote{голов}
+для совместимости с популярной реализацией алгоритма \enquote{Multi-Head Self-Attention} (MHSA) \cite{vaswani2017attention}. Тензор разбивается на $h$-\enquote{голов} с количеством каналов ${d_{k}=F_{N+1}/h}$ в каждой голове. Результаты вычисления $h$-\enquote{голов}
 \begin{equation*}
     \mathbf{H}_m = \text{Softmax}\left(\frac{\mathbf{Q}_m \mathbf{K}_m^\top}{\sqrt{d_k}}\right) \mathbf{V}_m,
 \end{equation*}
-${\mathbf{H}_m \in \mathbb{R}^{L_4 \times d_k}}$, ${m \in \{1, \dots, h\}}$, объединяются в единый тензор
+${\mathbf{H}_m \in \mathbb{R}^{L_{N+1} \times d_k}}$, ${m \in \{1, \dots, h\}}$, объединяются в единый тензор
 \begin{equation*}
     \mathbf{MH}_\text{perm} = \text{cat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O,
 \end{equation*}
-где \enquote{${\text{cat}(\cdot)}$} -- операция слияния по каналам, ${\mathbf{W}^O \in \mathbb{R}^{F_4 \times F_4}}$.
+где \enquote{${\text{cat}(\cdot)}$} -- операция слияния по каналам, ${\mathbf{W}^O \in \mathbb{R}^{F_{N+1} \times F_{N+1}}}$.
 
-${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается того же размера, что и ${\mathbf{b}_\text{in.perm}}$.
+${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получается того же размера, что и ${\mathbf{b}_\text{in.perm}}$.
 
-Входные переменные алгоритма MHSA ${\mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m \in \mathbb{R}^{L_4 \times d_k}}$ формируются в результате линейной проекции входа
+Входные переменные алгоритма MHSA ${\mathbf{Q}_m, \mathbf{K}_m, \mathbf{V}_m \in \mathbb{R}^{L_{N+1} \times d_k}}$ формируются в результате линейной проекции входа
 \begin{equation*}
     \begin{aligned}
         \mathbf{Q}_m &= \mathbf{b}_\text{in.perm} \mathbf{W}_m^Q, \\
@@ -150,7 +150,7 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается
 \end{equation*}
 через соответствующие матрицы
 \begin{equation*}
-    \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V \in \mathbb{R}^{F_4 \times d_{k}}.
+    \mathbf{W}_m^Q, \mathbf{W}_m^K, \mathbf{W}_m^V \in \mathbb{R}^{F_{N+1} \times d_{k}}.
 \end{equation*}
 
 Результирующим выходом алгоритма MHSA является сумма полученного тензора со входным тензором:
@@ -169,8 +169,8 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_4 \times F_4}}$ получается
 
 \begin{flalign*}
     & \begin{aligned}
-        \mathbf{W}^{1\text{MLP}} &\in \mathbb{R}^{(r \cdot F_4) \times F_4}, \\
-        \mathbf{W}^{2\text{MLP}} &\in \mathbb{R}^{F_4 \times (r \cdot F_4)}.
+        \mathbf{W}^{1\text{MLP}} &\in \mathbb{R}^{(r \cdot F_{N+1}) \times F_{N+1}}, \\
+        \mathbf{W}^{2\text{MLP}} &\in \mathbb{R}^{F_{N+1} \times (r \cdot F_{N+1})}.
     \end{aligned} &
 \end{flalign*}
 

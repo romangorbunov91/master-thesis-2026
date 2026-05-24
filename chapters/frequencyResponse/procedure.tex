@@ -77,7 +77,7 @@ def find_multipliers(fz: float, fd: float, err_rel_ref: float,
     R = fd / fz
     if R < 2:
         raise ValueError("fz must be < fd/2 for a valid solution.")
-    err_abs_ref = fz*err_rel_ref
+    err_abs_ref = fz * err_rel_ref
     Mmax = int(R / 2)
     N_vals = np.arange(Nmin, Nmax + 1, dtype=float)
     N_arr = np.empty(Mmax, dtype=np.int64)
