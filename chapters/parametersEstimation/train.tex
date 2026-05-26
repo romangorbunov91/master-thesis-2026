@@ -45,7 +45,7 @@
 \end{itemize}
 и функция потерь Дайса
 \begin{equation*}
-    \mathcal{L}^{\text{Dice}} = 1 - 2 \frac{\sum_{i=1}^{L} d_i y_i}{\sum_{i=1}^{L} d_i + \sum_{i=1}^{L} y_i + \varepsilon},
+    \mathcal{L}^{\text{Dice}} = 1 - 2 \frac{\sum_{i=1}^{L} d_i \mathord{\cdot} y_i}{\sum_{i=1}^{L} d_i + \sum_{i=1}^{L} y_i + \varepsilon},
 \end{equation*}
 вычисляются по каждому каналу $\{1, C_\text{out}\}$; в функцию потерь \eqref{eqn:lossfunc} входят уже усредненные по каналам значения.
 
@@ -58,7 +58,7 @@
 \subsection{Метрики}
 В качестве основного показателя качества детекции модели использован коэффициент Дайса:
 \begin{equation*}
-    \text{Dice} = 2 \frac{\sum_{i=1}^{L} \hat{y}_i y_i}{\sum_{i=1}^{L} \hat{y}_i + \sum_{i=1}^{L} y_i + \varepsilon},
+    \text{Dice} = 2 \frac{\sum_{i=1}^{L} \hat{y}_i \mathord{\cdot} y_i}{\sum_{i=1}^{L} \hat{y}_i + \sum_{i=1}^{L} y_i + \varepsilon},
 \end{equation*}
 где:
 \begin{itemize}
@@ -68,7 +68,7 @@
 
 К качестве вспомогательной метрики применен коэффициент Жаккара:
 \begin{equation*}
-    \text{IoU} = \frac{\sum_{i=1}^{L} \hat{y}_i y_i}{\sum_{i=1}^{L} \hat{y}_i + \sum_{i=1}^{L} y_i - \sum_{i=1}^{L} \hat{y}_i y_i + \varepsilon}.
+    \text{IoU} = \frac{\sum_{i=1}^{L} \hat{y}_i \mathord{\cdot} y_i}{\sum_{i=1}^{L} \hat{y}_i + \sum_{i=1}^{L} y_i - \sum_{i=1}^{L} \hat{y}_i \mathord{\cdot} y_i + \varepsilon}.
 \end{equation*}
 
 Обучение выполнено на NVIDIA GeForce RTX3060 (12~ГБ), torch=2.6.0, CUDA=12.6, cuDNN=9.5.1 при следующих гиперпараметрах:

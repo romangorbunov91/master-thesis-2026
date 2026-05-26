@@ -32,12 +32,12 @@
     \begin{enumerate}
         \item Вычисляются всевозможные значения
             \begin{equation*}
-                L = \left\lfloor \frac{M \cdot N}{R} \right\rfloor
+                L = \left\lfloor \frac{M \mathord{\cdot} N}{R} \right\rfloor
             \end{equation*}
         для ${N \in \left[ N_\text{min}; N_\text{max} \right]}$, с округлением $L$ до 1 при ${L<1}$.
         \item Значения $L$ используются для вычисления всевозможных приближений к начальному значению коэффициента ${R}$:
             \begin{equation*}
-                R^{'} = \frac{M \cdot N}{L}.
+                R^{'} = \frac{M \mathord{\cdot} N}{L}.
             \end{equation*}
         \item Значения ${R^{'}}$ используются для вычисления всевозможных приближений к исходному значению частоты ${f_{z}}$:
             \begin{equation*}
@@ -60,7 +60,7 @@
 \begin{enumerate}
     \item Отклонение от заданной частоты ${f_z}$ инжектируемого сигнала допустимо задавать в относительных единицах ${\epsilon^{*}_{f}}$, с последующим пересчетом в абсолютное значение
     \begin{equation*}
-        \Delta\epsilon^{*}_{f} = \epsilon^{*}_{f} \cdot f_z.
+        \Delta\epsilon^{*}_{f} = \epsilon^{*}_{f} \mathord{\cdot} f_z.
     \end{equation*}
     В таком случае, на вход алгоритма получается задать общее для всех частот относительное отклонение ${\epsilon^{*}_{f}}$. Абсолютные значения отклонения ${\Delta\epsilon^{*(k)}_{f}}$ сформируются в соответствии частотами ${f^{(k)}_z}$.
     \item Максимальное количество точек ${N_\text{max}}$ определяется размером памяти, доступной в буфере встраиваемой системы управления, зарезервированном под внутрисхемное измерение частотных характеристик.
@@ -68,14 +68,7 @@
 
 \begin{listing}[htbp]
     \caption{Программа поиска оптимального набора параметров}
-    \begin{minted}[
-      style=tango, 
-      fontsize=\small,
-      linenos,
-      frame=none,
-      numbersep=10pt,
-      xleftmargin=1.0em
-    ]{python}
+    \begin{minted}{python}
 import numpy as np
 
 def find_multipliers(fz: float, fd: float, err_rel_ref: float,
@@ -144,12 +137,12 @@ def find_multipliers(fz: float, fd: float, err_rel_ref: float,
 
 Соответствующее приближение к начальному значению коэффициента ${R}$:
 \begin{equation*}
-    R^{'} = \frac{M \cdot N}{\left\lfloor L \right\rfloor} = \frac{2 \cdot 43}{19} = \num{4.526}.
+    R^{'} = \frac{M \mathord{\cdot} N}{\left\lfloor L \right\rfloor} = \frac{2 \mathord{\cdot} 43}{19} = \num{4.526}.
 \end{equation*}
 
 Соответствующее приближение к исходному значению частоты ${f_{z}}$:
 \begin{equation*}
-    f^{'}_{z} = \frac{L}{M \cdot N}f_d = \frac{19}{2 \cdot 43} \num{100000} = \num{22093.023}~\text{Гц}.
+    f^{'}_{z} = \frac{L}{M \mathord{\cdot} N}f_d = \frac{19}{2 \mathord{\cdot} 43} \num{100000} = \num{22093.023}~\text{Гц}.
 \end{equation*}
 
 Относительное отклонение частоты

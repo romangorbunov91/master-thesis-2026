@@ -6,7 +6,7 @@
 
 На вход системы (канал управления $d[n]$) подаётся синусоидальная последовательность:
 \begin{equation}
-    p[n] = A \cdot \sin\left(2\pi f_k n T_s + \phi_0\right), \quad n = 0,1,\dots,N_k-1,
+    p[n] = A \mathord{\cdot} \sin\left(2\pi f_k n T_s + \phi_0\right), \quad n = 0,1,\dots,N_k-1,
     \label{eq:sine_pert}
 \end{equation}
 где:
@@ -19,7 +19,7 @@
 
 После переходного процесса ($\sim 3$--$5$ постоянных времени системы) регистрируется выходной сигнал $y[n]$ (напряжение/ток). Для подавления шума и гармоник применяется когерентное усреднение по $M$ периодам:
 \begin{equation}
-    \bar{y}[m] = \frac{1}{M} \sum_{\ell=0}^{M-1} y\left[m + \ell \cdot N_{\text{per}}\right], 
+    \bar{y}[m] = \frac{1}{M} \sum_{\ell=0}^{M-1} y\left[m + \ell \mathord{\cdot} N_{\text{per}}\right], 
     \quad m = 0,1,\dots,N_{\text{per}}-1,
     \label{eq:coherent_avg}
 \end{equation}
@@ -27,8 +27,8 @@
 
 Амплитуда и фаза отклика извлекаются через корреляцию с опорными синусом и косинусом (метод квадратурной демодуляции):
 \begin{align}
-    Y_{\cos}(f_k) &= \frac{2}{N} \sum_{n=0}^{N-1} \bar{y}[n] \cdot \cos(2\pi f_k n T_s), \label{eq:demod_cos} \\
-    Y_{\sin}(f_k) &= \frac{2}{N} \sum_{n=0}^{N-1} \bar{y}[n] \cdot \sin(2\pi f_k n T_s), \label{eq:demod_sin} \\
+    Y_{\cos}(f_k) &= \frac{2}{N} \sum_{n=0}^{N-1} \bar{y}[n] \mathord{\cdot} \cos(2\pi f_k n T_s), \label{eq:demod_cos} \\
+    Y_{\sin}(f_k) &= \frac{2}{N} \sum_{n=0}^{N-1} \bar{y}[n] \mathord{\cdot} \sin(2\pi f_k n T_s), \label{eq:demod_sin} \\
     G_{vd}(e^{j\omega_k T_s}) &= \frac{Y_{\cos}(f_k) - j Y_{\sin}(f_k)}{A}, \label{eq:transfer_func}
 \end{align}
 где $\omega_k = 2\pi f_k$. Формула \eqref{eq:transfer_func} даёт оценку передаточной функции на частоте $f_k$.
@@ -45,7 +45,7 @@
     \item Задать диапазон $[f_{\min}, f_{\max}]$ и закон развёртки:
     \begin{itemize}
         \item \textbf{Линейный}: $f_{k+1} = f_k + \Delta f$;
-        \item \textbf{Логарифмический}: $f_{k+1} = f_k \cdot r$, $r = (f_{\max}/f_{\min})^{1/(K-1)}$.
+        \item \textbf{Логарифмический}: $f_{k+1} = f_k \mathord{\cdot} r$, $r = (f_{\max}/f_{\min})^{1/(K-1)}$.
     \end{itemize}
     \item Для каждой $f_k$:
     \begin{enumerate}
@@ -147,36 +147,11 @@ CF(e) = \frac{\max_n |e(n, \boldsymbol{\phi})|}{\text{rms}(e(n, \boldsymbol{\phi
 \end{equation}
 где $\lambda_s > 0$ -- адаптивный параметр регуляризации, предотвращающий вырожденность матрицы $\hat{\mathbf{J}}_s^\top \hat{\mathbf{J}}_s$ и обеспечивающий глобальную сходимость, а $\mathbf{I}$ -- единичная матрица. Обновление фаз: $\hat{\boldsymbol{\phi}}_{s+1} = \hat{\boldsymbol{\phi}}_s + \mathbf{d}_s$.
 
-\begin{algorithm}[H]
-\caption{Минимизация CF с использованием L-M алгоритма}
-\begin{algorithmic}[1]
-\Require Параметры сигнала: $M, N, \{Z_m\}_{m=1}^M, \{f_m\}_{m=1}^M, T$; последовательность $\{p_k\}$; начальные фазы $\boldsymbol{\phi}^{(0)}$
-\Ensure Оптимизированный вектор фаз $\boldsymbol{\phi}^*$
-\State $\boldsymbol{\phi} \leftarrow \boldsymbol{\phi}^{(0)}$ \Comment{Случайные или фазы Шрёдера}
-\For{each $p$ in $\{4, 8, 16, \dots, p_{\max}\}$}
-    \State $h \leftarrow p/2$
-    \State Инициализировать $\lambda$ (например, $\lambda = 10^{-3}$)
-    \While{не выполнено условие сходимости}
-        \State Вычислить $\mathbf{E}$ по~\eqref{eq:residual} и $\hat{\mathbf{J}}$ по~\eqref{eq:jacobian}
-        \State Вычислить шаг $\mathbf{d}$ по~\eqref{eq:lm_step}
-        \State $\boldsymbol{\phi}_{\text{new}} \leftarrow \boldsymbol{\phi} + \mathbf{d}$
-        \If{$\|\mathbf{E}(\boldsymbol{\phi}_{\text{new}})\|^2 < \|\mathbf{E}(\boldsymbol{\phi})\|^2$}
-            \State $\boldsymbol{\phi} \leftarrow \boldsymbol{\phi}_{\text{new}}$
-            \State $\lambda \leftarrow \lambda / 10$
-        \Else
-            \State $\lambda \leftarrow \lambda \cdot 10$
-        \EndIf
-    \EndWhile
-\EndFor
-\State \Return $\boldsymbol{\phi}$
-\end{algorithmic}
-\end{algorithm}
-
 Метод демонстрирует превосходство над аналитическими фазами Шрёдера и эвристическими подходами (напр., алгоритм ABC) по следующим показателям:
 \begin{itemize}
     \item \textbf{Эффективность}: Значительное снижение минимального, среднего и максимального CF при увеличении числа гармоник $M$.
     \item \textbf{Вычислительная скорость}: Численная сходимость L-алгоритма в десятки раз быстрее эволюционных методов при сопоставимом или лучшем качестве решения.
-    \item \textbf{Идентификация FRF}: Сигналы с оптимизированным CF повышают отношение сигнал/шум (SNR) при измерении частотных характеристик, предотвращая насыщение усилителей и АЦП, что критично для прецизионных систем (напр., этапов позиционирования кремниевых пластин).
+    \item \textbf{Идентификация FRF}: Сигналы с оптимизированным CF повышают отношение сигнал/шум (SNR) при измерении частотных характеристик.
 \end{itemize}
 
 \subsection{Алгоритм с построением виртуальной модели объекта}
@@ -197,9 +172,9 @@ CF(e) = \frac{\max_n |e(n, \boldsymbol{\phi})|}{\text{rms}(e(n, \boldsymbol{\phi
 \begin{equation}
     \tilde{y}_k = F(\tilde{y}_{k-1}, \tilde{y}_{k-2}, \dots, \tilde{y}_{k-n}, u_k, u_{k-1}, \dots, u_{k-m}),
 \end{equation}
-где $u_k$ -- вектор входов системы, $\tilde{y}_k$ -- вектор прогнозируемых выходов модели, $n$ и $m$ --- количество задержек для выходов и входов соответственно, $F(\cdot)$ -- нелинейная функция, реализуемая статической ANN.
+где $u_k$ -- вектор входов системы, $\tilde{y}_k$ -- вектор прогнозируемых выходов модели, $n$ и $m$ --- количество задержек для выходов и входов соответственно, $F(\mathord{\cdot})$ -- нелинейная функция, реализуемая статической ANN.
 
-Для \textbf{обучения} используется \textbf{разомкнутый контур} (open-loop), где на входы задержки подаются истинные измеренные значения:
+Для обучения используется разомкнутый контур (open-loop), где на входы задержки подаются истинные измеренные значения:
 \begin{equation}
     \tilde{y}_k = F(y_{k-1}, y_{k-2}, \dots, y_{k-n}, u_k, u_{k-1}, \dots, u_{k-m}).
 \end{equation}

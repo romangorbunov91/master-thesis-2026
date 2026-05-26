@@ -12,11 +12,11 @@
 
 В отличии от алгоритма \ref{sec:Th_const}, длительность измерительного окна варьируется (рисунок~\ref{fig:Th_var_N_var}):
 \begin{equation}\label{eqn:windowlength}
-    T^{(k)}_{h} = L^{(k)} \cdot T^{(k)}_{z} = L^{(k)} \cdot R^{(k)} \cdot T_{d} = \underbrace{L^{(k)} \cdot Q^{(k)}}_{N^{(k)}} \cdot \underbrace{M^{(k)} \cdot T_d}_{T^{(k)}_{s}},
+    T^{(k)}_{h} = L^{(k)} \mathord{\cdot} T^{(k)}_{z} = L^{(k)} \mathord{\cdot} R^{(k)} \mathord{\cdot} T_{d} = \underbrace{L^{(k)} \mathord{\cdot} Q^{(k)}}_{N^{(k)}} \mathord{\cdot} \underbrace{M^{(k)} \mathord{\cdot} T_d}_{T^{(k)}_{s}},
 \end{equation}
 где ${R^{(k)} \in \mathbb{R}}$ -- соотношение между периодом инжектируемого сигнала и периодом выполнения операций в системе:
 \begin{equation*}
-    R^{(k)} = \cfrac{T^{(k)}_{z}} {T_{d}} = Q^{(k)} \cdot M^{(k)},
+    R^{(k)} = \cfrac{T^{(k)}_{z}} {T_{d}} = Q^{(k)} \mathord{\cdot} M^{(k)},
 \end{equation*}
 ${Q^{(k)} \in \mathbb{R}}$.
 
@@ -33,12 +33,12 @@ ${Q^{(k)} \in \mathbb{R}}$.
 
 Из равенства \eqref{eqn:windowlength}
 \begin{equation}\label{eqn:L_ratio}
-    L^{(k)} = \frac{N^{(k)} \cdot M^{(k)}}{R^{(k)}}.
+    L^{(k)} = \frac{N^{(k)} \mathord{\cdot} M^{(k)}}{R^{(k)}}.
 \end{equation}
 
 В связи с тем, что частота инжектируемого сигнала кратна частоте первой гармоники в спектре
 \begin{equation*}
-    f^{(k)}_{z} = L^{(k)} \cdot f^{(k)}_{h} = \cfrac{L^{(k)}}{T^{(k)}_{h}},
+    f^{(k)}_{z} = L^{(k)} \mathord{\cdot} f^{(k)}_{h} = \cfrac{L^{(k)}}{T^{(k)}_{h}},
 \end{equation*}
 множитель ${L^{(k)}}$ ограничен диапазоном
 \begin{equation*}

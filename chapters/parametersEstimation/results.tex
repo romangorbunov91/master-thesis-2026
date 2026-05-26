@@ -4,7 +4,7 @@
 Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей %(рисунки~\ref{fig:test_sample1}, \ref{fig:test_sample2}, \ref{fig:test_sample3}, \ref{fig:test_sample4}).
 
 \subsection{Результаты инференса данных эксперимента}
-По частотным характеристикам, измеренным в серии экспериментов, выполнена идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Инференс модели проведен как по характеристикам, измеренным внутрисхемно алгоритмом \ref{sec:fr_optim} (Приложение~\ref{appendix:application}), так и измеренным сертифицированным измерительным прибором AP300 Frequency Response Analyzer (Приложение~\ref{appendix:bench}).
+По частотным характеристикам, измеренным в серии экспериментов, выполнена идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Инференс модели проведен как по характеристикам, измеренным внутрисхемно алгоритмом \ref{sec:fr_optim} (приложение~\ref{appendix:application}), так и измеренным сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
 
 В теории, комплексный коэффициент передачи исследованных звеньев аппроксимируется следующими малосигнальными моделями:
 \begin{itemize}
@@ -15,20 +15,20 @@
 	где ${G_\text{PI}}$, ${\omega_\text{PI}}$ -- вещественные положительные числа.
 	\item ПИД-регулятор (рисунок~\ref{fig:G_I_PID_detection}):\par
 	\begin{equation*}
-		H_\text{PID}(s) = G_\text{PID} \frac{\left(1 + \frac{s}{\omega_\text{PI}}\right) \cdot \left(1 + \frac{s}{\omega_\text{PD}}\right)}{s \left(1 + \frac{s}{\omega_p}\right)},
+		H_\text{PID}(s) = G_\text{PID} \frac{\left(1 + \frac{s}{\omega_\text{PI}}\right) \mathord{\cdot} \left(1 + \frac{s}{\omega_\text{PD}}\right)}{s \left(1 + \frac{s}{\omega_p}\right)},
 	\end{equation*}
 	\item Коэффициент преобразования тока в напряжение (рисунок~\ref{fig:Wui_detection}, \ref{fig:Wui_delay_detection}):\par
 	\begin{equation*}
-		H_\text{ui}(s) = \frac{R}{2} \cdot \frac{U_\text{in}}{U_\text{out}} \cdot \frac{\left(1 - \frac{s}{\omega_\text{RHP}} \right) \cdot \left(1 + \frac{s}{\omega_\text{ESR}} \right)}{\left(1 + \frac{s}{ \omega_{RC}} \right)} e^{-s t_\text{delay}},
+		H_\text{ui}(s) = \frac{R}{2} \mathord{\cdot} \frac{U_\text{in}}{U_\text{out}} \mathord{\cdot} \frac{\left(1 - \frac{s}{\omega_\text{RHP}} \right) \mathord{\cdot} \left(1 + \frac{s}{\omega_\text{ESR}} \right)}{1 + \frac{s}{\omega_{RC}}} e^{-s t_\text{delay}},
 	\end{equation*}
-	где ${\omega_\text{RHP} = \frac{U_\text{in}^2}{U_\text{out}^2} \cdot \frac{R}{L}}$, ${\omega_\text{ESR} = \frac{1}{ESR \cdot C}}$, ${\omega_{RC} = \frac{2}{R \cdot C}}$.
+	где ${\omega_\text{RHP} = \frac{U_\text{in}^2}{U_\text{out}^2} \mathord{\cdot} \frac{R}{L}}$, ${\omega_\text{ESR} = \frac{1}{ESR \mathord{\cdot} C}}$, ${\omega_{RC} = \frac{2}{R \mathord{\cdot} C}}$.
 	\item Выходной импеданс выключенного источника питания (рисунок~\ref{fig:Zout_detection}):\par
 	\begin{equation*}
-		H_\text{out}(s) = \frac{1}{C} \cdot \frac{1 + \frac{s}{\omega_\text{ESR}}}{s}.
+		H_\text{out}(s) = \frac{1}{C} \mathord{\cdot} \frac{1 + \frac{s}{\omega_\text{ESR}}}{s}.
 	\end{equation*}
-	\item Выходной импеданс источника питания в режиме стабилизации тока (рисунок~\ref{fig:ZoutI_detection}):\par
+	\item Выходной импеданс источника питания в режиме стабилизации тока (рис.~\ref{fig:ZoutI_detection}):\par
 	\begin{equation*}
-		H_\text{out}^\text{I}(s) = \frac{R}{2} \cdot \frac{1 + \frac{s}{\omega_\text{ESR}}}{1 + \frac{s}{ \omega_{RC}}}.
+		H_\text{out}^\text{I}(s) = \frac{R}{2} \mathord{\cdot} \frac{1 + \frac{s}{\omega_\text{ESR}}}{1 + \frac{s}{ \omega_{RC}}}.
 	\end{equation*}
 \end{itemize}
 

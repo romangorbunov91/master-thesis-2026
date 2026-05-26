@@ -100,12 +100,12 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 \end{equation*}
 где ядро проекции ${\mathbf{W}_n^{\text{enc}} \in \mathbb{R}^{F_{n} \times F_{n-1} \times KS}}$.
 
-Между слоями энкодера длина тензора уменьшается в 2 раза алгоритмом \enquote{nn.MaxPool1d}:
+Между слоями энкодера длина тензора уменьшается в 2 раза алгоритмом \enquote{\texttt{nn.MaxPool1d}}:
 \begin{equation*}
     \mathbf{e}_{n} \rightarrow \mathbf{e}_{n}{\downarrow_2}.
 \end{equation*}
 
-Регуляризация во время обучения выполняется алгоритмом \enquote{nn.Dropout1d}, выполняемым на выходе второй свертки.
+Регуляризация во время обучения выполняется алгоритмом \enquote{\texttt{nn.Dropout1d}}, выполняемым на выходе второй свертки.
 
 Таким образом, в энкодере производится последовательное увеличение числа каналов (\enquote{фичей}) с одновременным уменьшением длины тензора.
 
@@ -136,7 +136,7 @@ ${\mathbf{H}_m \in \mathbb{R}^{L_{N+1} \times d_k}}$, ${m \in \{1, \dots, h\}}$,
 \begin{equation*}
     \mathbf{MH}_\text{perm} = \text{cat}(\mathbf{H}_1, \dots, \mathbf{H}_h)\mathbf{W}^O,
 \end{equation*}
-где \enquote{${\text{cat}(\cdot)}$} -- операция слияния по каналам, ${\mathbf{W}^O \in \mathbb{R}^{F_{N+1} \times F_{N+1}}}$.
+где \enquote{${\text{cat}(\mathord{\cdot})}$} -- операция слияния по каналам, ${\mathbf{W}^O \in \mathbb{R}^{F_{N+1} \times F_{N+1}}}$.
 
 ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получается того же размера, что и ${\mathbf{b}_\text{in.perm}}$.
 
@@ -169,12 +169,12 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получа
 
 \begin{flalign*}
     & \begin{aligned}
-        \mathbf{W}^{1\text{MLP}} &\in \mathbb{R}^{(r \cdot F_{N+1}) \times F_{N+1}}, \\
-        \mathbf{W}^{2\text{MLP}} &\in \mathbb{R}^{F_{N+1} \times (r \cdot F_{N+1})}.
+        \mathbf{W}^{1\text{MLP}} &\in \mathbb{R}^{(r \mathord{\cdot} F_{N+1}) \times F_{N+1}}, \\
+        \mathbf{W}^{2\text{MLP}} &\in \mathbb{R}^{F_{N+1} \times (r \mathord{\cdot} F_{N+1})}.
     \end{aligned} &
 \end{flalign*}
 
-Регуляризация во время обучения выполняется алгоритмом \enquote{nn.Dropout} после каждого \enquote{Feed-Forward}-слоя.
+Регуляризация во время обучения выполняется алгоритмом \enquote{\texttt{nn.Dropout}} после каждого \enquote{Feed-Forward}-слоя.
 
 \subsection{Декодер}
 Декодер последовательно приближает данные скрытого пространства к изначальной длине ${L_1}$ и числу каналов ${F_1}$.
@@ -195,7 +195,7 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получа
     \tilde{\mathbf{d}}_n = \text{cat}\left(\tilde{\mathbf{e}}_n, \mathbf{g}_n \right).
 \end{equation*}
 
-Преобразование тензора декодера аналогично преобразованию, выполняемому на входе \enquote{Bottleneck}, только с предварительным увеличением длины тензора в 2 раза алгоритмом \enquote{nn.Upsample}:
+Преобразование тензора декодера аналогично преобразованию, выполняемому на входе \enquote{Bottleneck}, только с предварительным увеличением длины тензора в 2 раза алгоритмом \enquote{\texttt{nn.Upsample}}:
 \begin{equation*}
     \mathbf{g}_n = \sigma\left(\mathcal{N}^{\text{dec}}\left(\mathbf{W}^{\text{dec}} \ast \mathbf{d}_{n+1}{\uparrow_2}\right)\right),
 \end{equation*}
