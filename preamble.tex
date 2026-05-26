@@ -2,7 +2,7 @@
 \usepackage[T2A]{fontenc}      % Cyrillic font encoding
 \usepackage{tempora}   % Times New Roman for main text.
 \usepackage{amsmath, mathtools}
-\usepackage{newtxmath}   % Times New Roman for math symbols.
+\usepackage{newtxmath}  % Times New Roman for math symbols.
 \usepackage{bm}
 \usepackage{cmap}              % Makes Cyrillic text searchable/copyable in PDF
 \usepackage[russian]{babel}    % Russian hyphenation & captions
@@ -13,6 +13,7 @@
 \clubpenalty=10000
 \tolerance=2000     % Терпимость к жидким строкам.
 \righthyphenmin=2   % Минимальное число символов при переносе.
+
 
 % Page layout & spacing.
 \usepackage{geometry}
@@ -36,11 +37,12 @@
   topsep=0pt, partopsep=0pt
   }
 \setlist[enumerate,2]{label=\arabic{enumi}.\arabic*., leftmargin=*}
-      
+
 \usepackage{caption}
+\DeclareCaptionLabelSeparator{mydash}{~--~}
 \captionsetup[figure]{
   name=Рисунок,
-  labelsep=period,
+  labelsep=mydash,
   justification=centering,
   skip=0pt,
   aboveskip=12pt,
@@ -48,7 +50,7 @@
 }
 \captionsetup[table]{
   name=Таблица,
-  labelsep=period,
+  labelsep=mydash,
   justification=raggedright,
   singlelinecheck=off,
   skip=0pt,  % Vertical space between block caption.
@@ -58,64 +60,65 @@
 \captionsetup[listing]{
   name=Листинг программы,  
   %font=small,
-  labelsep=period,
+  labelsep=mydash,
   justification=raggedright,
   singlelinecheck=false,
   labelfont=bf,
   textfont=normalfont,
   skip=0pt,     % Vertical space between block caption.
   aboveskip=0pt,
-  belowskip=0pt
+  belowskip=0pt,
 }
   
 \usepackage{titlesec}
+\newcommand{\nohyphens}{\hyphenpenalty=10000\exhyphenpenalty=10000}
 % Chapter: size (pt), centered, numbered inline.
-\titleformat{\chapter}[display]
-  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont} % <format>
+\titleformat{\chapter}
+  {\normalfont\centering\bfseries\fontsize{14pt}{21pt}\selectfont\nohyphens} % <format>
+  {\thechapter} % <before-code>
+  {6pt}                                     % <sep>
   {}                                        % <label> (empty → removes separate block)
-  {0pt}                                     % <sep>
-  {\thechapter.\quad} % <before-code>
 
 % Unnumbered chapters (\chapter*{...}).
-\titleformat{name=\chapter,numberless}[display]
-  {\normalfont\centering\bfseries\fontsize{16pt}{20pt}\selectfont}
+\titleformat{name=\chapter,numberless}
+  {\normalfont\centering\bfseries\fontsize{14pt}{21pt}\selectfont\nohyphens}
   {}
   {0pt}
   {}
 
 % Section and Subsection: 14pt, left-aligned, numbered.
 \titleformat{\section}
-  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {\thesection.}
-  {1em}
+  {\normalfont\bfseries\fontsize{14pt}{21pt}\selectfont\nohyphens}
+  {\thesection}
+  {6pt}
   {}
 
 \titleformat{\subsection}
-  {\normalfont\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {\thesubsection.}
-  {1em}
+  {\normalfont\bfseries\fontsize{14pt}{21pt}\selectfont\nohyphens}
+  {\thesubsection}
+  {6pt}
   {}
 
 \usepackage{titletoc}
-\addto\captionsrussian{\renewcommand{\contentsname}{Содержание}}
+\addto\captionsrussian{\renewcommand{\contentsname}{СОДЕРЖАНИЕ}}
 
 \titlecontents{chapter}[0pt]
   {\vspace{0pt}\normalfont}
-  {\thecontentslabel.\hspace{0.25em}}
+  {\thecontentslabel\hspace{0.25em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
 
 \titlecontents{section}[1em]
   {\vspace{0pt}\normalfont}
-  {\thecontentslabel.\hspace{0.2em}}
+  {\thecontentslabel\hspace{0.25em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
 
 \titlecontents{subsection}[2.5em]
   {\vspace{0pt}\normalfont}
-  {\thecontentslabel.\hspace{0.2em}}
+  {\thecontentslabel\hspace{0.25em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
@@ -128,13 +131,13 @@
 
 \newcommand{\setupappendix}{%
   \setcounter{chapter}{0}%
-  \renewcommand{\chaptername}{Приложение}%
+  \renewcommand{\chaptername}{ПРИЛОЖЕНИЕ}%
   \renewcommand{\thechapter}{\cyralph{\value{chapter}}}%
   \renewcommand{\theHchapter}{app\thechapter}%
   
   \titlecontents{chapter}[0pt]
     {\vspace{0pt}\normalfont}
-    {Приложение~\thecontentslabel.\hspace{0.25em}}
+    {ПРИЛОЖЕНИЕ~\thecontentslabel\hspace{0.25em}}
     {}
     {\titlerule*[1pc]{.}\contentspage}
     []%
@@ -144,12 +147,12 @@
   \counterwithin{figure}{chapter}%
   \counterwithin{table}{chapter}%
     
-  % Chapter heading format for appendices
+  % Chapter heading format for appendices.
   \titleformat{\chapter}[display]
-  {\normalfont\centering\bfseries\fontsize{14pt}{17pt}\selectfont}
-  {}
-  {0pt}
-  {\chaptername~\thechapter.\hspace{0.25em}}%
+    {\normalfont\centering\bfseries\fontsize{14pt}{21pt}\selectfont}
+    {}
+    {0pt}
+    {ПРИЛОЖЕНИЕ~\thechapter\\}
 }
 
 % Utilities.

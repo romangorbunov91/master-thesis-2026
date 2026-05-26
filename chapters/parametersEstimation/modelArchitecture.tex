@@ -1,6 +1,6 @@
 \section{Архитектура модели}
 
-Модель основана на архитектуре энкодер-декодер (рис.~\ref{fig:model_block_diagram}), состоящей из $N$-уровней и выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
+Модель основана на архитектуре энкодер-декодер (рисунок~\ref{fig:model_block_diagram}), состоящей из $N$-уровней и выполняющей преобразование ${C_{\text{in}}}$-канального тензора длиной ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
 \begin{equation*}
     \textbf{Y}: \, \mathbb{R}^{C_{\text{in}} \times L_1} \mapsto \mathbb{R}^{C_{\text{out}} \times L_1}.
 \end{equation*}
@@ -69,7 +69,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 Количество обучаемых параметров построенной модели составляет порядка \num{5.3}~M.
 
 \subsection{Энкодер}
-Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation} (рис.~\ref{fig:residual_conv_diagram}), обеспечивающая улучшенный градиентный поток для ускорения сходимости при обучении \cite{he2016identity}.
+Энкодер преобразует входные данные в латентное (скрытое) пространство уменьшенной размерности. В созданной реализации энкодер состоит из каскада $N$ сверточных базовых блоков. Заложена \enquote{residual}-архитектура базового блока по типу \enquote{pre-activation} (рисунок~\ref{fig:residual_conv_diagram}), обеспечивающая улучшенный градиентный поток для ускорения сходимости при обучении \cite{he2016identity}.
 
 \begin{figure}[H]
 	\centering
@@ -110,7 +110,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 Таким образом, в энкодере производится последовательное увеличение числа каналов (\enquote{фичей}) с одновременным уменьшением длины тензора.
 
 \subsection{\enquote{Bottleneck}}
-\enquote{Bottleneck} реализован на основе трансформера (рис.~\ref{fig:bottleneck_block_diagram}), с предварительной проекцией числа каналов на входе.
+\enquote{Bottleneck} реализован на основе трансформера (рисунок~\ref{fig:bottleneck_block_diagram}), с предварительной проекцией числа каналов на входе.
 
 \begin{figure}[H]
 	\centering
@@ -179,7 +179,7 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получа
 \subsection{Декодер}
 Декодер последовательно приближает данные скрытого пространства к изначальной длине ${L_1}$ и числу каналов ${F_1}$.
 
-\enquote{Residual}-архитектура базового блока декодера в точности повторяет блок энкодера (рис.~\ref{fig:residual_conv_diagram}):
+\enquote{Residual}-архитектура базового блока декодера в точности повторяет блок энкодера (рисунок~\ref{fig:residual_conv_diagram}):
 
 \begin{equation*}
     \begin{aligned}
@@ -201,7 +201,7 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получа
 \end{equation*}
 где ${\mathbf{W}^{\text{dec}}} \in \mathbb{R}^{F_n \times F_{n+1} \times KS}$.
 
-Тензор ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя $n$ энкодера на соответствующую одноканальную карту признаков (карту \enquote{позиционного внимания}) ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) \in \mathbb{R}^{1 \times L_n}}$, формирующуюся алгоритмом \cite{oktay2018attention} (рис.~\ref{fig:skip_conn_diagram}):
+Тензор ${\tilde{\mathbf{e}}_n}$ формируется \enquote{взвешиванием} выхода слоя $n$ энкодера на соответствующую одноканальную карту признаков (карту \enquote{позиционного внимания}) ${\boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right) \in \mathbb{R}^{1 \times L_n}}$, формирующуюся алгоритмом \cite{oktay2018attention} (рисунок~\ref{fig:skip_conn_diagram}):
 \begin{equation*}
     \tilde{\mathbf{e}}_n = \mathbf{e}_n \odot \boldsymbol{\psi}_n \left(\mathbf{e}_n, \mathbf{g}_n \right),
 \end{equation*}
