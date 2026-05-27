@@ -13,7 +13,7 @@
 !header.tex
 
 !main.pdf
-#!referat.pdf
+!referat.pdf
 
 # Recursively ignore everything in chapters/, then un-ignore .tex
 chapters/**/*
