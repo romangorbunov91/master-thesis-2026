@@ -1,0 +1,1 @@
+Проект собран в [TeX Live](https://tug.org/texlive/windows.html): pdfTeX 3.141592653-2.6-1.40.29 (TeX Live 2026)
