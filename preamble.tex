@@ -13,7 +13,7 @@
 \clubpenalty=10000
 \tolerance=2000     % Терпимость к жидким строкам.
 \righthyphenmin=2   % Минимальное число символов при переносе.
-
+\usepackage{comment}
 
 % Page layout & spacing.
 \usepackage{geometry}
@@ -116,13 +116,15 @@
   {\titlerule*[1pc]{.}\contentspage}
   []
 
+\begin{comment}
 \titlecontents{subsection}[2.5em]
   {\vspace{0pt}\normalfont}
   {\thecontentslabel\hspace{0.25em}}
   {}
   {\titlerule*[1pc]{.}\contentspage}
   []
-
+  
+\end{comment}
 
 \makeatletter
 \newcommand{\cyralph}[1]{%
@@ -159,7 +161,6 @@
 \usepackage{siunitx}
 \sisetup{output-decimal-marker = {,}}
 \usepackage{float}
-\usepackage{comment}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{threeparttable}
