@@ -17,18 +17,17 @@
 \end{equation}
 где ${R^{(k)} \in \mathbb{R}}$ -- соотношение между периодом инжектируемого сигнала и периодом выполнения операций в системе:
 \begin{equation*}
-    R^{(k)} = \cfrac{T^{(k)}_{z}} {T_{d}} = Q^{(k)} \mathord{\cdot} M^{(k)},
+    R^{(k)} = \cfrac{T^{(k)}_z} {T_d} = Q^{(k)} \mathord{\cdot} M^{(k)},
 \end{equation*}
 ${Q^{(k)} \in \mathbb{R}}$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics [width=1.00\linewidth] {frequencyResponse/Th_var_N_var.drawio.png}
+    \includegraphics [width=1.00\linewidth] {frequencyResponse/Th_var_N_var.pdf}
 
-    \caption{Параметры ${N, M, L}$ алгоритма при разных ${T^{(k)}_{z}}$}
+    \caption{Параметры ${N, M, L}$ алгоритма при разных ${T^{(k)}_z}$}
     \label{fig:Th_var_N_var}
 \end{figure}
-
 
 Аналогично алгоритму \ref{sec:Th_const}, соотношение между периодом инжектируемого сигнала и периодом дискретизации может принимать дробные значения. В совокупности с изменяемой длительностью измерительного окна это обеспечивает на интервале ${f \in \left(0; {f_d / 2} \right)}$ сколь угодно много потенциальных значений частот ${f_z}$ инжектируемого сигнала, что \textbf{является главной отличительной особенностью алгоритма}.
 
