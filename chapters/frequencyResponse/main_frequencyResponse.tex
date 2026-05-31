@@ -48,7 +48,11 @@
 \begin{equation}\label{eqn:complexFreqResp}
     H^{(k)} = \cfrac{Y^{(k)}\left[L^{(k)}\right]}{X^{(k)}\left[L^{(k)}\right]} = \left| H^{(k)} \right| e^{j \angle H^{(k)}},
 \end{equation}
-${L^{(k)} = {T^{(k)}_{h}} / {T^{(k)}_{z}}}$.
+где ${L^{(k)} \in \mathbb{N}_{>0}}$ -- номер гармоники, равный количеству целых периодов инжектируемого сигнала ${{T^{(k)}_{z}}}$ на измерительном окне ${T^{(k)}_{h}}$:
+\begin{equation*}
+    L^{(k)} = \left\lfloor\cfrac{T^{(k)}_{h}}{T^{(k)}_{z}}\right\rfloor.
+\end{equation*}
+
 
 Пары значений ${f^{(k)}_{z}}$, ${\left| H^{(k)} \right|}$ и ${f^{(k)}_{z}}$, ${\angle H^{(k)}}$ образуют амплитудно-частотную и фазо-частотную характеристики, соответственно.
 \begin{equation}\label{eqn:abs_angleFreqResp}
