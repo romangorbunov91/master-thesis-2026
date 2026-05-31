@@ -209,8 +209,63 @@
 \def\epsilon{\varepsilon}
 
 % Bibliography.
-\usepackage[style=gost-numeric, sorting=none, backend=biber]{biblatex}
+\usepackage[
+  style=gost-numeric,
+  sorting=none,
+  backend=biber,
+  isbn=false,
+  url=true,
+  doi=true,
+  defernumbers=true,
+  autocite=plain
+  ]{biblatex}
 \addbibresource{references.bib}
+
+\DefineBibliographyStrings{russian}{
+  bibliography = {СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ},
+  andothers    = {et\addabbrvspace al\adddot},
+  volume       = {Vol\adddot},
+  number       = {No\adddot},
+  pages        = {P\adddot},
+  january      = {Jan\adddot},
+  february     = {Feb\adddot},
+  march        = {Mar\adddot},
+  april        = {Apr\adddot},
+  may          = {May},
+  june         = {June},
+  july         = {July},
+  august       = {Aug\adddot},
+  september    = {Sep\adddot},
+  october      = {Oct\adddot},
+  november     = {Nov\adddot},
+  december     = {Dec\adddot},
+}
+
+\renewcommand*{\newblockpunct}{\addperiod\space\textendash\space}
+\renewcommand*{\bibpagespunct}{\space\textendash\space}
+\DefineBibliographyExtras{russian}{%
+  \protected\def\bibrangedash{%
+    \textendash\penalty\hyphenpenalty}% Заменяем em-dash на en-dash в диапазонах
+}
+\DeclareNameAlias{sortname}{given-family} 
+\DeclareNameAlias{default}{given-family}
+
+% 2. Принудительно убираем любой шрифт (курсив/жирный) с полей имени
+\DeclareFieldFormat{labelname}{#1}       % Имена в списке литературы
+\DeclareFieldFormat{firstinits}{#1}      % Инициалы
+\DeclareFieldFormat{givenname}{#1}       % Имена
+\DeclareFieldFormat{surname}{#1}         % Фамилии
+
+\renewbibmacro*{url+urldate}{%
+  \ifentrytype{misc}{%
+    \setunit*{\addspace}% 
+    \printfield{url}%
+    \iffieldundef{urlyear}
+      {}
+      {\setunit*{\addspace}%
+       \printtext[parens]{\printurldate}}%
+  }{}%
+}
 
 % Hyperlinks.
 \usepackage{hyperref}
