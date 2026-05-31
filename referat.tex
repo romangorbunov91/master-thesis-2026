@@ -161,17 +161,7 @@
 \DeclareFieldFormat{givenname}{#1}       % Имена
 \DeclareFieldFormat{surname}{#1}         % Фамилии
 
-\renewbibmacro*{url+urldate}{%
-  \ifentrytype{misc}{%
-    \setunit*{\addspace}% 
-    \printfield{url}%
-    \iffieldundef{urlyear}
-      {}
-      {\setunit*{\addspace}%
-       \printtext[parens]{\printurldate}}%
-  }{}%
-}
-\setlength{\bibitemsep}{8pt}
+\setlength{\bibitemsep}{6pt}
 
 \graphicspath{{images/}}
 
@@ -360,7 +350,7 @@
 
     \textbf{В заключении} кратко подводятся полученные результаты.
 
-    \vspace{12pt}
+    \vspace{10pt}
     \needspace{1\baselineskip}
     \noindent\textbf{Публикации по теме работы}
     \begin{itemize}
