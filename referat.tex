@@ -114,9 +114,64 @@
     \titlespacing*{\section}{0pt}{0pt}{12pt}
 }
 
-\usepackage[sorting=none, backend=biber]{biblatex}
-\setlength{\bibitemsep}{5pt}
+\usepackage[
+  style=gost-numeric,
+  sorting=none,
+  backend=biber,
+  isbn=false,
+  url=true,
+  doi=true,
+  defernumbers=true,
+  autocite=plain
+  ]{biblatex}
 \addbibresource{references.bib}
+
+\DefineBibliographyStrings{russian}{
+  bibliography = {СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ},
+  andothers    = {et\addabbrvspace al\adddot},
+  volume       = {Vol\adddot},
+  number       = {No\adddot},
+  pages        = {P\adddot},
+  january      = {Jan\adddot},
+  february     = {Feb\adddot},
+  march        = {Mar\adddot},
+  april        = {Apr\adddot},
+  may          = {May},
+  june         = {June},
+  july         = {July},
+  august       = {Aug\adddot},
+  september    = {Sep\adddot},
+  october      = {Oct\adddot},
+  november     = {Nov\adddot},
+  december     = {Dec\adddot},
+}
+
+\renewcommand*{\newblockpunct}{\addperiod\space\textendash\space}
+\renewcommand*{\bibpagespunct}{\space\textendash\space}
+\DefineBibliographyExtras{russian}{%
+  \protected\def\bibrangedash{%
+    \textendash\penalty\hyphenpenalty}% Заменяем em-dash на en-dash в диапазонах
+}
+\DeclareNameAlias{sortname}{given-family} 
+\DeclareNameAlias{default}{given-family}
+
+% 2. Принудительно убираем любой шрифт (курсив/жирный) с полей имени
+\DeclareFieldFormat{labelname}{#1}       % Имена в списке литературы
+\DeclareFieldFormat{firstinits}{#1}      % Инициалы
+\DeclareFieldFormat{givenname}{#1}       % Имена
+\DeclareFieldFormat{surname}{#1}         % Фамилии
+
+\renewbibmacro*{url+urldate}{%
+  \ifentrytype{misc}{%
+    \setunit*{\addspace}% 
+    \printfield{url}%
+    \iffieldundef{urlyear}
+      {}
+      {\setunit*{\addspace}%
+       \printtext[parens]{\printurldate}}%
+  }{}%
+}
+\setlength{\bibitemsep}{8pt}
 
 \graphicspath{{images/}}
 
@@ -299,12 +354,13 @@
     \noindent\textbf{Третья глава «Разработка алгоритмов идентификации параметров макромоделей»}\par
     В третьей главе поставленная задача по идентификации параметров макромодели линейного звена системы автоматического регулирования решена посредством идентификации частот полюсов и нулей передаточной функции этого звена. Разработана нейросетевая модель, реализующая по частотным характеристикам детектирование областей частот, на которых расположены полюса/нули передаточной функции. Координаты полюсов/нулей вычисляются как центры детектируемых областей частот. Пересчет в физические параметры, при необходимости, осуществляется по математической модели самого звена, определяющей связь между полюсами/нулями передаточной функции и физическими параметрами объекта. Перечисленные этапы составляют полный алгоритм идентификации параметров.
 
-    Модель основана на архитектуре энкодер-декодер, состоящей из 4 уровней (Приложение~\ref{appendix:paramestim}) \cite{gorbunov2026freqrespencoder}. На вход модели поступает частотная характеристика, приведенная тензору в ${C_{\text{in}}}$-каналов длины ${L_1}$. Модель выполняет преобразование этого тензора в ${C_{\text{out}}}$-канальный тензор той же длины с последующим выделением бинарных масок. Количество каналов ${C_\text{out}}$ соответствует количеству детектируемых объектов. 
+    Модель основана на архитектуре энкодер-декодер, состоящей из 4 уровней (Приложение~\ref{appendix:paramestim}) \cite{gorbunov2026freqrespencoder}. На вход модели поступает частотная характеристика, приведенная тензору в ${C_{\text{in}}}$-каналов длины ${L_1}$. Модель выполняет преобразование этого тензора в ${C_{\text{out}}}$-канальный тензор той же длины с последующим выделением бинарных масок. Количество каналов ${C_\text{out}}$ соответствует количеству детектируемых объектов. Количество обучаемых параметров построенной модели составляет порядка \num{5.3}~M.
     
-    Обучение модели выполнено на синтетическом наборе данных, состоящем из \enquote{Train}, \enquote{Val} и \enquote{Test}-коллекций csv-таблиц частотных характеристик и json-файлов с координатами полюсов/нулей \cite{gorbunov2026zerospolesmasks}. В ходе обучения минимизировалась комбинированная функция потерь (бинарная перекрестная энтропия, функция потерь Дайса).
+    Обучение модели выполнено на синтетическом наборе данных, состоящем из \enquote{Train}, \enquote{Val} и \enquote{Test}-коллекций csv-таблиц частотных характеристик и json-файлов с координатами полюсов/нулей \cite{gorbunov2026zerospolesmasks}. В ходе обучения минимизировалась комбинированная функция потерь (бинарная перекрестная энтропия, функция потерь Дайса). Коэффициента Дайса на тестовом наборе данных составил \num{0.8163}. Модель корректно работает на данных, полученных в серии экспериментов (Приложение~\ref{appendix:bench}).
 
     \textbf{В заключении} кратко подводятся полученные результаты.
 
+    \vspace{12pt}
     \needspace{1\baselineskip}
     \noindent\textbf{Публикации по теме работы}
     \begin{itemize}
@@ -335,10 +391,10 @@
     \begin{equation*}
 		H_\text{ui}(s) = \frac{R}{2} \mathord{\cdot} \frac{U_\text{in}}{U_\text{out}} \mathord{\cdot} \frac{\left(1 - \frac{s}{\omega_\text{RHP}} \right) \mathord{\cdot} \left(1 + \frac{s}{\omega_\text{ESR}} \right)}{1 + \frac{s}{\omega_{RC}}}
 	\end{equation*}
-    на частотах ${\omega_\text{RHP}}$, ${\omega_\text{ESR}}$, ${\omega_{RC}}$, соответственно. Параметры $R$, ${U_\text{in}}$, ${U_\text{out}}$ -- дифференциальное сопротивление нагрузки, входное и выходное напряжение источника питания. Зоны детекции, выделенные разработанной моделью, соответствуют ожидаемым расчетным значениям частот полюсов/нулей (рисунок~\ref{fig:Wui_detection}).
+    на частотах ${\omega_\text{RHP}}$, ${\omega_\text{ESR}}$, ${\omega_{RC}}$, соответственно. Параметры $R$, ${U_\text{in}}$, ${U_\text{out}}$ -- дифференциальное сопротивление нагрузки, входное и выходное напряжение источника питания. Разработанная модель корректно детектировала правый ноль и левый полюс (рисунок~\ref{fig:Wui_detection}).
     \begin{figure}[htbp]
         \centering
-        \includegraphics [width=1.00\linewidth] {parametersEstimation/Wui.pdf}
+        \includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_300_DP.pdf}
 
         \caption{Результаты детекции полюсов/нулей по частотным характеристикам коэффициента преобразования тока в напряжение (внутрисхемное измерение)}
         \label{fig:Wui_detection}
@@ -373,18 +429,17 @@
         \label{fig:model_block_diagram}
     \end{figure}
 
-    Количество обучаемых параметров построенной модели составляет порядка \num{5.3}~M. Обучение модели выполнено на NVIDIA GeForce RTX3060 (12~ГБ) при следующих гиперпараметрах:
+    Обучение модели выполнено на NVIDIA GeForce RTX3060 (12~ГБ) при следующих гиперпараметрах:
     \begin{itemize}
         \item Количество уровней энкодера: ${N=4}$.
         \item Количество каналов (\enquote{фичей}):\par
         ${F_0=32}$, ${F_1=32}$, ${F_2=64}$, ${F_3=128}$, ${F_4=256}$, ${F_5=512}$.
         \item Весовые коэффициенты комбинированной функции ошибки:\par
-        ${w^\text{BCE}=\num{0.25}}$, ${w^\text{Dice}=\num{0.75}}$.
+        ${w^\text{BCE}=\num{0.5}}$, ${w^\text{Dice}=\num{0.5}}$.
         \item Весовые коэффициенты глубокого супервизирования:\par
         ${w_1 = \num{1.00}}$, ${w_2 = \num{0.50}}$, ${w_3 = \num{0.25}}$, ${w_4 = \num{0.125}}$.
         \item Размер батча: 360.
         \item Решатель: \enquote{Adam}.
     \end{itemize}
     
-    Коэффициента Дайса на тестовом наборе данных составил \num{0.8196}.
 \end{document}
