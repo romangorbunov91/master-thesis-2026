@@ -79,7 +79,7 @@
     \item Количество каналов (\enquote{фичей}):\par
     ${F_0=32}$, ${F_1=32}$, ${F_2=64}$, ${F_3=128}$, ${F_4=256}$, ${F_5=512}$.
     \item Весовые коэффициенты функции ошибки:\par
-    ${w^\text{BCE}=\num{0.25}}$, ${w^\text{Dice}=\num{0.75}}$.
+    ${w^\text{BCE}=\num{0.5}}$, ${w^\text{Dice}=\num{0.5}}$.
     \item Весовые коэффициенты глубокого супервизирования:\par
     ${w_1 = \num{1.00}}$, ${w_2 = \num{0.50}}$, ${w_3 = \num{0.25}}$, ${w_4 = \num{0.125}}$.
     \item Размер батча: 360.
@@ -95,9 +95,9 @@
         \begin{tabular}{|l|l|l|l|l|}
             \hline
                     &                & \textbf{Dice} & \textbf{IoU} & \textbf{Комментарий}                                  \\ \hline
-            \textbf{1.} & \textbf{Train} & 0.9092        & 0.8580       & Случайные аугментации: $G$, ${t_\text{delay}}$, шумы. \\ \hline
-            \textbf{2.} & \textbf{Val}   & 0.9393        & 0.9030       & Нет аугментаций.\tnote{*}                                  \\ \hline
-            \textbf{3.} & \textbf{Test}  & 0.9221        & 0.8774       & Нет аугментаций.\tnote{**}                                  \\ \hline
+            \textbf{1.} & \textbf{Train} & \num{0.8131}        & \num{0.7446}       & Случайные аугментации: $G$, ${t_\text{delay}}$, шумы. \\ \hline
+            \textbf{2.} & \textbf{Val}   & \num{0.8981}        & \num{0.8448}       & Нет аугментаций.\tnote{*}                                  \\ \hline
+            \textbf{3.} & \textbf{Test}  & \num{0.8163}        & \num{0.7485}       & Нет аугментаций.\tnote{**}                                  \\ \hline
         \end{tabular}
         \begin{tablenotes}
             \small

@@ -3,7 +3,47 @@
 \needspace{1\baselineskip}
 \subsection{Результаты инференса случайных примеров из тестового набора данных}
 
-Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей %(рисунки~\ref{fig:test_sample1}, \ref{fig:test_sample2}, \ref{fig:test_sample3}, \ref{fig:test_sample4}).
+Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей (рисунки~\labelcref{fig:test_sample1,fig:test_sample2,fig:test_sample3,fig:test_sample4,fig:test_sample5}).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/0zp1lp0rp0lz0rz_018.pdf}
+
+	\caption{Случайный пример~1 из тестового набора данных}
+	\label{fig:test_sample1}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/0zp1lp0rp0lz1rz_028.pdf}
+
+	\caption{Случайный пример~2 из тестового набора данных}
+	\label{fig:test_sample2}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/1zp1lp0rp0lz0rz_075.pdf}
+
+	\caption{Случайный пример~3 из тестового набора данных}
+	\label{fig:test_sample3}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/1zp1lp0rp1lz0rz_076.pdf}
+
+	\caption{Случайный пример~4 из тестового набора данных}
+	\label{fig:test_sample4}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/1zp1lp0rp1lz1rz_038.pdf}
+
+	\caption{Случайный пример~5 из тестового набора данных}
+	\label{fig:test_sample5}
+\end{figure}
 
 \needspace{1\baselineskip}
 \subsection{Результаты инференса данных эксперимента}
@@ -11,7 +51,7 @@
 
 В теории, комплексный коэффициент передачи исследованных звеньев аппроксимируется следующими малосигнальными моделями:
 \begin{itemize}
-	\item ПИ-регулятор (рисунок~\ref{fig:G_I_PI_detection}, \ref{fig:G_U_PI_detection}):\par
+	\item ПИ-регулятор (рисунки~\ref{fig:G_I_PI_detection}, \ref{fig:G_U_PI_detection}):\par
 	\begin{equation*}
 		H_\text{PI}(s) = G_\text{PI} \frac{1 + \frac{s}{\omega_\text{PI}}}{s},
 	\end{equation*}
@@ -39,7 +79,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PI.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PI_300_DP.pdf}
 
 	\caption{Частотные характеристики ПИ-регулятора контура регулирования тока (внутрисхемное измерение)}
 	\label{fig:G_I_PI_detection}
@@ -47,7 +87,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_U_PI.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_U_PI_300_DP.pdf}
 
 	\caption{Частотные характеристики ПИ-регулятора контура стабилизации напряжения (внутрисхемное измерение)}
 	\label{fig:G_U_PI_detection}
@@ -55,7 +95,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PID.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PID_300_DP.pdf}
 
 	\caption{Частотные характеристики ПИД-регулятора контура регулирования тока (внутрисхемное измерение)}
 	\label{fig:G_I_PID_detection}
@@ -63,7 +103,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_300_DP.pdf}
 
 	\caption{Частотные характеристики коэффициента преобразования тока в напряжение (внутрисхемное измерение)}
 	\label{fig:Wui_detection}
@@ -71,7 +111,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_delay_300_DP.pdf}
 
 	\caption{Частотные характеристики коэффициента преобразования тока в напряжение с задержкой по времени (внутрисхемное измерение)}
 	\label{fig:Wui_delay_detection}
@@ -79,7 +119,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/Zout.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Zout_300_AP.pdf}
 
 	\caption{Частотные характеристики выходного импеданса выключенного источника питания (измерение внешним анализатором)}
 	\label{fig:Zout_detection}
@@ -87,7 +127,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/ZoutI.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/ZoutI_300_AP.pdf}
 
 	\caption{Частотные характеристики выходного импеданса источника питания в режиме стабилизации тока (измерение внешним анализатором)}
 	\label{fig:ZoutI_detection}
