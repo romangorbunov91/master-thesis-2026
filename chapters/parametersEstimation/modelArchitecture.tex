@@ -1,6 +1,6 @@
 \section{Архитектура модели}
 
-Модель основана на архитектуре энкодер-декодер (рисунок~\ref{fig:model_block_diagram}) \cite{gorbunov2026freqrespencoder}, состоящей из $N$-уровней и выполняющей преобразование ${C_{\text{in}}}$-канального тензора длины ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
+Модель основана на архитектуре энкодер-декодер (рисунок~\ref{fig:model_block_diagram}) \cite{gorbunov2026freqrespencoder}, состоящей из $N$ уровней и выполняющей преобразование ${C_{\text{in}}}$-канального тензора длины ${L_1}$ в ${C_{\text{out}}}$-канальный тензор той же длины:
 \begin{equation*}
     \textbf{Y}: \, \mathbb{R}^{C_{\text{in}} \times L_1} \mapsto \mathbb{R}^{C_{\text{out}} \times L_1}.
 \end{equation*}
@@ -51,7 +51,7 @@
 \end{equation*}
 где \enquote{${\ast}$} -- операция свертки, ${\mathbf{W}_n^\text{DS} \in \mathbb{R}^{C_\text{out} \times F_n \times KS}}$, ${KS}$ -- размер ядра (\enquote{Kernel Size}). Количество каналов ${C_\text{out}}$ соответствует количеству детектируемых объектов. Выходные тензоры ${\mathbf{d}'_n}$ представляют собой логиты.
 
-Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_n}$, ${n > 1}$, используются только на этапе обучения модели с целью повысить глубину обучения.
+Выходы глубокого супервизирования (\enquote{Deep Supervision} \cite{lee2015deeply}) с промежуточных слоев декодера ${\mathbf{d}'_n}$, ${n > 1}$, используются только на этапе обучения модели с целью повышения глубины обучения.
 
 Выделение бинарных масок ${\hat{y}_i}$, ${i \in \{1, \dots, L_1\}}$, осуществляется преобразованием логитов ${d_i}$ основного выхода модели ${\mathbf{d}'_1}$:
 \begin{equation}\label{eqn:logit2mask}
@@ -81,7 +81,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 	\label{fig:residual_conv_diagram}
 \end{figure}
 
-Каждый $n$-й базовы блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n \times KS}}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n \times KS}}$, соответственно:
+Каждый $n$-й базовый блок, ${n \in \{1, \dots, N\}}$, выполняет последовательно две свертки с ядрами ${\mathbf{W}_n^{1\text{enc}} \in \mathbb{R}^{F_{n-1} \times F_n \times KS}}$, ${\mathbf{W}_n^{2\text{enc}} \in \mathbb{R}^{F_n \times F_n \times KS}}$:
 
 \begin{equation*}
     \begin{aligned}
@@ -125,7 +125,7 @@ ${\tau}$ -- пороговый уровень, ${\tau \in \left[0; 1 \right]}$.
 
 На вход \enquote{bottleneck} поступает тензор ${\mathbf{e}_N \in \mathbb{R}^{F_N \times L_N}}$ с выхода энкодера. Тензор преобразуется к ${\mathbf{b}_\text{in} \in \mathbb{R}^{F_{N+1} \times L_{N+1}}}$:
 \begin{equation*}
-    \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}^P\left(\mathbf{W}^P \ast \mathbf{e}_3{\downarrow_2}\right)\right),
+    \mathbf{b}_\text{in} = \sigma\left(\mathcal{N}^P\left(\mathbf{W}^P \ast \mathbf{e}_N{\downarrow_2}\right)\right),
 \end{equation*}
 где ${\mathbf{W}^P \in \mathbb{R}^{F_{N+1} \times F_N \times KS}}$, и к \enquote{permute}-формату ${\mathbf{b}_\text{in.perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$:
 \begin{equation*}
@@ -162,7 +162,7 @@ ${\mathbf{MH}_\text{perm} \in \mathbb{R}^{L_{N+1} \times F_{N+1}}}$ получа
 \end{equation*}
 для чего форма представления тензора предварительно преобразуется обратно (${\mathbf{MH}_\text{perm} \rightarrow \mathbf{MH}}$).
 
-После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (\enquote{Multi-Layer Perceptron}, MLP). Реализованы два \enquote{Feed-Forward}-слоя поканальной обработки с промежуточным увеличением скрытого пространства в $r$-раз:
+После алгоритма MHSA выполняется нормализация данных для их последующей обработки полносвязными слоями (\enquote{Multi-Layer Perceptron}, MLP). Реализованы два \enquote{Feed-Forward}-слоя поканальной обработки с промежуточным увеличением скрытого пространства в $r$ раз:
 \begin{equation*}
     \mathbf{z}^\text{MLP} = \mathbf{W}^{2\text{MLP}} \sigma\left(\mathbf{W}^{1\text{MLP}} \mathcal{N}^\text{MLP}\left( \mathbf{b}_\text{attn} \right)\right),
 \end{equation*}
