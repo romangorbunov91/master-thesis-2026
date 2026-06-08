@@ -3,7 +3,7 @@
 \needspace{1\baselineskip}
 \subsection{Результаты инференса случайных примеров из тестового набора данных}
 
-Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей (рисунки~\labelcref{fig:test_sample1,fig:test_sample2,fig:test_sample3,fig:test_sample4,fig:test_sample5,fig:test_sample6,fig:test_sample7,fig:test_sample8,fig:test_sample9}).
+Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей (рисунки~\labelcref{fig:test_sample1,fig:test_sample2,fig:test_sample3,fig:test_sample4,fig:test_sample5,fig:test_sample6,fig:test_sample7,fig:test_sample8,fig:test_sample9}). Ошибка идентификации параметров не превышает 15\% (таблица~\ref{tbl:test_estim}).
 
 \begin{figure}[H]
 	\centering
@@ -76,6 +76,52 @@
 	\caption{Случайный пример~9 из тестового набора данных}
 	\label{fig:test_sample9}
 \end{figure}
+
+\begin{table}[htbp]
+    \caption{Результаты идентификации параметров случайных примеров из тестового набора данных}
+    \label{tbl:test_estim}
+    \begin{threeparttable}
+        \begin{tabular}{|l|l|l|l|l|l|}
+            \hline
+            & \multicolumn{1}{c|}{\textbf{Пример}} & \multicolumn{1}{c|}{\textbf{Объект}} & \multicolumn{1}{c|}{\shortstack{\textbf{Предск.}\\\textbf{част., Гц}}} & \multicolumn{1}{c|}{\shortstack{\textbf{Целев.}\\\textbf{част., Гц}}} & \multicolumn{1}{c|}{\textbf{${\epsilon}$, \%}} \\ \hline
+            \textbf{1.} & 0zp0lp1rp2lz1rz\_078 & Полюс правый & \multicolumn{1}{r|}{\num{755362}} & \multicolumn{1}{r|}{\num{744592}} & \multicolumn{1}{r|}{\num{1.45}}\\ \hline
+            & & Ноль левый & \multicolumn{1}{r|}{\num{20837}} & \multicolumn{1}{r|}{\num{19393}} & \multicolumn{1}{r|}{\num{7.45}}\\ \hline
+            & & Ноль левый & \multicolumn{1}{r|}{\num{142768}} & \multicolumn{1}{r|}{\num{153397}} & \multicolumn{1}{r|}{\num{6.93}}\\ \hline
+			& & Ноль правый & \multicolumn{1}{r|}{\num{3041}} & \multicolumn{1}{r|}{\num{3041}} & \multicolumn{1}{r|}{\num{0.00}}\\ \hline
+			\textbf{2.} & 0zp1lp0rp0lz1rz\_028 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{3.} & 0zp2lp1rp1lz0rz\_022 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{4.} & 0zp2lp1rp1lz0rz\_035 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{5.} & 1zp0lp1rp2lz1rz\_098 & Полюс правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{6.} & 1zp1lp0rp1lz0rz\_076 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{7.} & 1zp1lp0rp1lz1rz\_038 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{8.} & 1zp2lp1rp1lz0rz\_013 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{9.} & 1zp2lp1rp1lz0rz\_019 & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Полюс правый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			& & Ноль левый & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+
+        \end{tabular}
+    \end{threeparttable}
+\end{table}
+
+
+
 \needspace{1\baselineskip}
 \subsection{Результаты инференса данных эксперимента}
 По частотным характеристикам, измеренным в серии экспериментов, выполнена идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Инференс модели проведен как по характеристикам, измеренным внутрисхемно алгоритмом \ref{sec:fr_optim} (приложение~\ref{appendix:application}), так и по характеристикам, измеренным сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
