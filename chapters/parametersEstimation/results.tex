@@ -131,7 +131,7 @@
 \begin{itemize}
 	\item Звено преобразования тока в напряжение (рисунок~\ref{fig:Wui_detection}, \ref{fig:Wui_delay_detection}):\par
 	\begin{equation*}
-		H_\text{ui}(s) = \cfrac{R}{2} \mathord{\cdot} \cfrac{U_\text{in}}{U_\text{out}} \mathord{\cdot} \cfrac{\left(1 - \cfrac{s}{\omega_\text{RHP}} \right) \mathord{\cdot} \left(1 + \cfrac{s}{\omega_\text{ESR}} \right)}{1 + \cfrac{s}{\omega_{RC}}} e^{-s t_\text{delay}},
+		H_\text{ui}(s) = \cfrac{R}{2} \mathord{\cdot} \cfrac{U_\text{in}}{U_\text{out}} \mathord{\cdot} \cfrac{\left(1 - \cfrac{s}{\omega_\text{RHP}} \right) \mathord{\cdot} \left(1 + \cfrac{s}{\omega_\text{ESR}} \right)}{1 + \cfrac{s}{\omega_{RC}}} e^{-s \mathord{\cdot} t_\text{delay}},
 	\end{equation*}
 	где ${\omega_\text{RHP} = \cfrac{U_\text{in}^2}{U_\text{out}^2} \mathord{\cdot} \cfrac{R}{L}}$, ${\omega_\text{ESR} = \cfrac{1}{ESR \mathord{\cdot} C}}$, ${\omega_{RC} = \cfrac{2}{R \mathord{\cdot} C}}$.
 
@@ -163,20 +163,26 @@
 В примерах на рисунках~\labelcref{fig:Wui_detection,fig:Wui_delay_detection} не детектирован левый ноль, ожидаемый по теоретической модели динамического звена. В действительности этот левый ноль и не проявился, что подтверждается малой ошибкой аппроксимации моделью без левого нуля (рисунки~\labelcref{fig:fr_approx_model_Wui,fig:fr_approx_model_Wui_delay}) и почти в 2 раза большей ошибкой аппроксимации моделью с левым нулем (рисунки~\labelcref{fig:fr_approx_calc_Wui,fig:fr_approx_calc_Wui_delay}, таблица~\ref{tbl:experiment_rmse}).
 
 \begin{table}[htbp]
-    \caption{Ошибка аппроксимации частотных характеристик, измеренных в эксперименте}
+    \caption{Ошибка аппроксимации измеренных частотных характеристик}
     \label{tbl:experiment_rmse}
     \begin{threeparttable}
         \begin{tabular}{|l|l|l|l|l|}
             \hline
-            & \multicolumn{1}{c|}{\textbf{Частотные характеристики}} & \multicolumn{1}{c|}{\textbf{RMSE1}} & \multicolumn{1}{c|}{\textbf{RMSE2}} & \multicolumn{1}{c|}{\textbf{RMSE3}} \\ \hline
-            \textbf{1.} & Звено преобр. тока в напряжение & \multicolumn{1}{r|}{\num{0.0356}} & \multicolumn{1}{r|}{\num{0.0144}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
-            \textbf{2.} & Звено преобр. тока в напряж. с задержкой & \multicolumn{1}{r|}{\num{0.0307}} & \multicolumn{1}{r|}{\num{0.0123}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
-            \textbf{3.} & ПИ-регулятор контура регулир. тока & \multicolumn{1}{r|}{\num{0.5574}} & \multicolumn{1}{r|}{\num{0.1381}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
-			\textbf{4.} & ПИД-регулятор контура регулир. тока & \multicolumn{1}{r|}{\num{0.2557}} & \multicolumn{1}{r|}{\num{0.0650}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
-			\textbf{5.} & ПИ-регулятор контура стабилиз. напряж. & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
-			\textbf{6.} & Выходной импеданс (источник выключен) & \multicolumn{1}{r|}{\num{0.2557}} & \multicolumn{1}{r|}{\num{0.0650}} & \multicolumn{1}{r|}{--}\\ \hline
-			\textbf{7.} & Выходной импеданс (стабилизация тока) & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{--}\\ \hline
+            & \multicolumn{1}{c|}{\textbf{Частотные характеристики}} & \multicolumn{1}{c|}{\textbf{RMSE\tnote{1}}} & \multicolumn{1}{c|}{\textbf{RMSE\tnote{2}}} & \multicolumn{1}{c|}{\textbf{RMSE\tnote{3}}} \\ \hline
+            \textbf{1.} & Звено преобр. тока в напряжение & \multicolumn{1}{r|}{\num{0.0814}} & \multicolumn{1}{r|}{\num{0.1221}} & \multicolumn{1}{r|}{\num{0.0593}}\\ \hline
+            \textbf{2.} & Звено преобр. тока в напряж. с задержкой & \multicolumn{1}{r|}{\num{0.0583}} & \multicolumn{1}{r|}{\num{0.1250}} & \multicolumn{1}{r|}{\num{0.0509}}\\ \hline
+            \textbf{3.} & ПИ-регулятор контура регулир. тока & \multicolumn{1}{r|}{\num{14.4284}} & \multicolumn{1}{r|}{\num{14.4287}} & \multicolumn{1}{r|}{\num{17.7491}}\\ \hline
+			\textbf{4.} & ПИД-регулятор контура регулир. тока & \multicolumn{1}{r|}{\num{3.2634}} & \multicolumn{1}{r|}{\num{3.1328}} & \multicolumn{1}{r|}{\num{3.6439}}\\ \hline
+			\textbf{5.} & ПИ-регулятор контура стабилиз. напряж. & \multicolumn{1}{r|}{\num{3.4304}} & \multicolumn{1}{r|}{\num{3.4656}} & \multicolumn{1}{r|}{\num{4.3966}}\\ \hline
+			\textbf{6.} & Выходной импеданс (источник выключен) & \multicolumn{1}{r|}{\num{0.0201}} & \multicolumn{1}{r|}{\num{0.0201}} & \multicolumn{1}{r|}{--}\\ \hline
+			\textbf{7.} & Выходной импеданс (стабилизация тока) & \multicolumn{1}{r|}{\num{0.0144}} & \multicolumn{1}{r|}{\num{0.0146}} & \multicolumn{1}{r|}{--}\\ \hline
         \end{tabular}
+		\begin{tablenotes}
+            \small
+            \item[1] Параметры идентифицированы разработанным алгоритмом.
+            \item[2] Параметры теоретической модели.
+            \item[3] Сравнение с частотными характеристиками, измеренными анализатором цепей.
+        \end{tablenotes}
     \end{threeparttable}
 \end{table}
 
