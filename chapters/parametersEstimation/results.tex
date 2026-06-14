@@ -125,37 +125,111 @@
 
 \needspace{1\baselineskip}
 \subsection{Результаты детекции объектов и идентификации параметров в данных эксперимента}
-По частотным характеристикам, измеренным в серии экспериментов, выполнена идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Инференс модели проведен как по характеристикам, измеренным внутрисхемно алгоритмом \ref{sec:fr_optim} (приложение~\ref{appendix:application}), так и по характеристикам, измеренным сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
+По частотным характеристикам, измеренным в серии экспериментов, выполнена детекция объектов и идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Качество функционирования модели сегментации проверено как на характеристиках, измеренных внутрисхемно алгоритмом \ref{sec:fr_optim} (Приложение~\ref{appendix:application}), так и на характеристиках, измеренных анализатором цепей AP300 Frequency Response Analyzer (Приложение~\ref{appendix:bench}).
 
 Теоретически ожидается, что комплексный коэффициент передачи исследованных звеньев аппроксимируется следующими малосигнальными моделями:
 \begin{itemize}
+	\item Звено преобразования тока в напряжение (рисунок~\ref{fig:Wui_detection}, \ref{fig:Wui_delay_detection}):\par
+	\begin{equation*}
+		H_\text{ui}(s) = \cfrac{R}{2} \mathord{\cdot} \cfrac{U_\text{in}}{U_\text{out}} \mathord{\cdot} \cfrac{\left(1 - \cfrac{s}{\omega_\text{RHP}} \right) \mathord{\cdot} \left(1 + \cfrac{s}{\omega_\text{ESR}} \right)}{1 + \cfrac{s}{\omega_{RC}}} e^{-s t_\text{delay}},
+	\end{equation*}
+	где ${\omega_\text{RHP} = \cfrac{U_\text{in}^2}{U_\text{out}^2} \mathord{\cdot} \cfrac{R}{L}}$, ${\omega_\text{ESR} = \cfrac{1}{ESR \mathord{\cdot} C}}$, ${\omega_{RC} = \cfrac{2}{R \mathord{\cdot} C}}$.
+
 	\item ПИ-регулятор (рисунки~\ref{fig:G_I_PI_detection}, \ref{fig:G_U_PI_detection}):\par
 	\begin{equation*}
-		H_\text{PI}(s) = G_\text{PI} \frac{1 + \frac{s}{\omega_\text{PI}}}{s},
+		H_\text{PI}(s) = G_\text{PI} \cfrac{1 + \cfrac{s}{\omega_\text{PI}}}{s},
 	\end{equation*}
 	где ${G_\text{PI}}$, ${\omega_\text{PI}}$ -- вещественные положительные числа.
+	
 	\item ПИД-регулятор (рисунок~\ref{fig:G_I_PID_detection}):\par
 	\begin{equation*}
-		H_\text{PID}(s) = G_\text{PID} \frac{\left(1 + \frac{s}{\omega_\text{PI}}\right) \mathord{\cdot} \left(1 + \frac{s}{\omega_\text{PD}}\right)}{s \left(1 + \frac{s}{\omega_p}\right)},
+		H_\text{PID}(s) = G_\text{PID} \cfrac{\left(1 + \cfrac{s}{\omega_\text{PI}}\right) \mathord{\cdot} \left(1 + \cfrac{s}{\omega_\text{PD}}\right)}{s \left(1 + \cfrac{s}{\omega_p}\right)},
 	\end{equation*}
-	\item Коэффициент преобразования тока в напряжение (рисунок~\ref{fig:Wui_detection}, \ref{fig:Wui_delay_detection}):\par
-	\begin{equation*}
-		H_\text{ui}(s) = \frac{R}{2} \mathord{\cdot} \frac{U_\text{in}}{U_\text{out}} \mathord{\cdot} \frac{\left(1 - \frac{s}{\omega_\text{RHP}} \right) \mathord{\cdot} \left(1 + \frac{s}{\omega_\text{ESR}} \right)}{1 + \frac{s}{\omega_{RC}}} e^{-s t_\text{delay}},
-	\end{equation*}
-	где ${\omega_\text{RHP} = \frac{U_\text{in}^2}{U_\text{out}^2} \mathord{\cdot} \frac{R}{L}}$, ${\omega_\text{ESR} = \frac{1}{ESR \mathord{\cdot} C}}$, ${\omega_{RC} = \frac{2}{R \mathord{\cdot} C}}$.
+	где ${G_\text{PID}}$, ${\omega_\text{PI}}$, ${\omega_\text{PD}}$, ${\omega_p}$ -- вещественные положительные числа.
+	
 	\item Выходной импеданс выключенного источника питания (рисунок~\ref{fig:Zout_detection}):\par
 	\begin{equation*}
-		H_\text{out}(s) = \frac{1}{C} \mathord{\cdot} \frac{1 + \frac{s}{\omega_\text{ESR}}}{s}.
+		H_\text{out}(s) = \cfrac{1}{C} \mathord{\cdot} \cfrac{1 + \cfrac{s}{\omega_\text{ESR}}}{s}.
 	\end{equation*}
+	
 	\item Выходной импеданс источника питания в режиме стабилизации тока (рис.~\ref{fig:ZoutI_detection}):\par
 	\begin{equation*}
-		H_\text{out}^\text{I}(s) = \frac{R}{2} \mathord{\cdot} \frac{1 + \frac{s}{\omega_\text{ESR}}}{1 + \frac{s}{ \omega_{RC}}}.
+		H_\text{out}^\text{I}(s) = \cfrac{R}{2} \mathord{\cdot} \cfrac{1 + \cfrac{s}{\omega_\text{ESR}}}{1 + \cfrac{s}{ \omega_{RC}}}.
 	\end{equation*}
 \end{itemize}
 
-Выбранные динамические звенья показательны: охватывают широкий спектр наборов полюсов/нулей, включая ноль на нулевой частоте (интеграторы 0-го и 1-го порядка), правый ноль и задержки по времени.
+Выбранные динамические звенья показательны: охватывают несколько наборов полюсов/нулей, включая ноль на нулевой частоте (интеграторы 0-го и 1-го порядка), правый ноль и задержки по времени.
 
-В примере на рисунках~\labelcref{fig:Wui_detection,fig:fr_approx_calc_Wui,fig:Wui_delay_detection,fig:fr_approx_calc_Wui_delay} не детектирован левый ноль, ожидаемый исходя из теоретической модели динамического звена. Однако, в действительности этот левый ноль не проявился. Учет этого нуля снижает точность аппроксимации (рисунки~\labelcref{fig:fr_approx_model_Wui,fig:fr_approx_model_Wui_delay}).
+В примерах на рисунках~\labelcref{fig:Wui_detection,fig:Wui_delay_detection} не детектирован левый ноль, ожидаемый по теоретической модели динамического звена. В действительности этот левый ноль и не проявился, что подтверждается малой ошибкой аппроксимации моделью без левого нуля (рисунки~\labelcref{fig:fr_approx_model_Wui,fig:fr_approx_model_Wui_delay}) и почти в 2 раза большей ошибкой аппроксимации моделью с левым нулем (рисунки~\labelcref{fig:fr_approx_calc_Wui,fig:fr_approx_calc_Wui_delay}, таблица~\ref{tbl:experiment_rmse}).
+
+\begin{table}[htbp]
+    \caption{Ошибка аппроксимации частотных характеристик, измеренных в эксперименте}
+    \label{tbl:experiment_rmse}
+    \begin{threeparttable}
+        \begin{tabular}{|l|l|l|l|l|}
+            \hline
+            & \multicolumn{1}{c|}{\textbf{Частотные характеристики}} & \multicolumn{1}{c|}{\textbf{RMSE1}} & \multicolumn{1}{c|}{\textbf{RMSE2}} & \multicolumn{1}{c|}{\textbf{RMSE3}} \\ \hline
+            \textbf{1.} & Звено преобр. тока в напряжение & \multicolumn{1}{r|}{\num{0.0356}} & \multicolumn{1}{r|}{\num{0.0144}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+            \textbf{2.} & Звено преобр. тока в напряж. с задержкой & \multicolumn{1}{r|}{\num{0.0307}} & \multicolumn{1}{r|}{\num{0.0123}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+            \textbf{3.} & ПИ-регулятор контура регулир. тока & \multicolumn{1}{r|}{\num{0.5574}} & \multicolumn{1}{r|}{\num{0.1381}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{4.} & ПИД-регулятор контура регулир. тока & \multicolumn{1}{r|}{\num{0.2557}} & \multicolumn{1}{r|}{\num{0.0650}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{5.} & ПИ-регулятор контура стабилиз. напряж. & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{\num{0.0144}}\\ \hline
+			\textbf{6.} & Выходной импеданс (источник выключен) & \multicolumn{1}{r|}{\num{0.2557}} & \multicolumn{1}{r|}{\num{0.0650}} & \multicolumn{1}{r|}{--}\\ \hline
+			\textbf{7.} & Выходной импеданс (стабилизация тока) & \multicolumn{1}{r|}{\num{0.3255}} & \multicolumn{1}{r|}{\num{0.0839}} & \multicolumn{1}{r|}{--}\\ \hline
+        \end{tabular}
+    \end{threeparttable}
+\end{table}
+
+\clearpage
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_300_DP.pdf}
+
+	\caption{Частотные характеристики звена преобразования тока в напряжение (внутрисхемное измерение)}
+	\label{fig:Wui_detection}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Wui_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик звена преобразования тока в напряжение моделью типа \enquote{0zp\textbf{1lp}0rp0lz\textbf{1rz}}}
+	\label{fig:fr_approx_model_Wui}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_delay_300_DP.pdf}
+
+	\caption{Частотные характеристики звена преобразования тока в напряжение с задержкой по времени (внутрисхемное измерение)}
+	\label{fig:Wui_delay_detection}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Wui_delay_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик звена преобразования тока в напряжение моделью типа \enquote{0zp\textbf{1lp}0rp0lz\textbf{1rz}} с задержкой}
+	\label{fig:fr_approx_model_Wui_delay}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Wui_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик звена преобразования тока в напряжение моделью типа \enquote{0zp\textbf{1lp}0rp\textbf{1lz1rz}}}
+	\label{fig:fr_approx_calc_Wui}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Wui_delay_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик звена преобразования тока в напряжение моделью типа \enquote{0zp\textbf{1lp}0rp\textbf{1lz1rz}} с задержкой}
+	\label{fig:fr_approx_calc_Wui_delay}
+\end{figure}
 
 \clearpage
 \begin{figure}[H]
@@ -168,27 +242,10 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_G_I_PI_300_DP.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_G_I_PI_300_DP.pdf}
 
-	\caption{Аппроксимация частотных характеристик ПИ-регулятора контура регулирования тока моделью типа \textbf{\enquote{1zp1lz}}}
-	\label{fig:fr_approx_calc_G_I_PI}
-\end{figure}
-
-\clearpage
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_U_PI_300_DP.pdf}
-
-	\caption{Частотные характеристики ПИ-регулятора контура стабилизации напряжения (внутрисхемное измерение)}
-	\label{fig:G_U_PI_detection}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_G_U_PI_300_DP.pdf}
-
-	\caption{Аппроксимация частотных характеристик ПИ-регулятора контура стабилизации напряжения моделью типа \textbf{\enquote{1zp1lz}}}
-	\label{fig:fr_approx_calc_G_U_PI}
+	\caption{Аппроксимация частотных характеристик ПИ-регулятора контура регулирования тока моделью типа \enquote{\textbf{1zp}0lp0rp\textbf{1lz}0rz}}
+	\label{fig:fr_approx_model_G_I_PI}
 \end{figure}
 
 \clearpage
@@ -202,61 +259,27 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_G_I_PID_300_DP.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_G_I_PID_300_DP.pdf}
 
-	\caption{Аппроксимация частотных характеристик ПИД-регулятора контура регулирования тока моделью типа \textbf{\enquote{1zp2lz}}}
-	\label{fig:fr_approx_calc_G_I_PID}
+	\caption{Аппроксимация частотных характеристик ПИД-регулятора контура регулирования тока моделью типа \enquote{\textbf{1zp}0lp0rp\textbf{2lz}0rz}}
+	\label{fig:fr_approx_model_G_I_PID}
 \end{figure}
 
 \clearpage
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_300_DP.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_U_PI_300_DP.pdf}
 
-	\caption{Частотные характеристики коэффициента преобразования тока в напряжение (внутрисхемное измерение)}
-	\label{fig:Wui_detection}
+	\caption{Частотные характеристики ПИ-регулятора контура стабилизации напряжения (внутрисхемное измерение)}
+	\label{fig:G_U_PI_detection}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Wui_300_DP.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_G_U_PI_300_DP.pdf}
 
-	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1rz}}}
-	\label{fig:fr_approx_calc_Wui}
-\end{figure}
-
-\clearpage
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_delay_300_DP.pdf}
-
-	\caption{Частотные характеристики коэффициента преобразования тока в напряжение с задержкой по времени (внутрисхемное измерение)}
-	\label{fig:Wui_delay_detection}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Wui_delay_300_DP.pdf}
-
-	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1rz}} с задержкой}
-	\label{fig:fr_approx_calc_Wui_delay}
-\end{figure}
-
-\clearpage
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Wui_300_DP.pdf}
-
-	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1lz1rz}}}
-	\label{fig:fr_approx_model_Wui}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Wui_delay_300_DP.pdf}
-
-	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1lz1rz}} с задержкой}
-	\label{fig:fr_approx_model_Wui_delay}
+	\caption{Аппроксимация частотных характеристик ПИ-регулятора контура стабилизации напряжения моделью типа \enquote{\textbf{1zp}0lp0rp\textbf{1lz}0rz}}
+	\label{fig:fr_approx_model_G_U_PI}
 \end{figure}
 
 \clearpage
@@ -270,10 +293,10 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Zout_300_AP.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Zout_300_AP.pdf}
 
-	\caption{Аппроксимация частотных характеристик выходного импеданса выключенного источника питания моделью типа \textbf{\enquote{1zp1lz}}}
-	\label{fig:fr_approx_calc_Zout}
+	\caption{Аппроксимация частотных характеристик выходного импеданса выключенного источника питания моделью типа \enquote{\textbf{1zp}0lp0rp\textbf{1lz}0rz}}
+	\label{fig:fr_approx_model_Zout}
 \end{figure}
 
 \clearpage
@@ -287,8 +310,8 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Zouti_300_AP.pdf}
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Zouti_300_AP.pdf}
 
-	\caption{Аппроксимация частотных характеристик выходного импеданса источника питания в режиме стабилизации тока моделью типа \textbf{\enquote{0zp1lp1lz}}}
-	\label{fig:fr_approx_calc_Zouti}
+	\caption{Аппроксимация частотных характеристик выходного импеданса источника питания в режиме стабилизации тока моделью типа \enquote{0zp\textbf{1lp}0rp\textbf{1lz}0rz}}
+	\label{fig:fr_approx_model_Zouti}
 \end{figure}
