@@ -1,9 +1,11 @@
-\section{Результаты инференса}
+\section{Результаты детекции объектов и идентификации параметров}
 
 \needspace{1\baselineskip}
-\subsection{Результаты инференса случайных примеров из тестового набора данных}
+\subsection{Результаты детекции объектов и идентификации параметров в случайных примерах из тестового набора данных}
 
 Маски, полученные на выходе модели при обработке случайных примеров из тестового набора данных, полностью перекрывают истинные координаты полюсов/нулей (рисунки~\labelcref{fig:test_sample1,fig:test_sample2,fig:test_sample3,fig:test_sample4,fig:test_sample5,fig:test_sample6,fig:test_sample7,fig:test_sample8,fig:test_sample9}). Ошибка идентификации параметров не превышает 15\% (таблица~\ref{tbl:test_estim}).
+
+Исключение, и в то же время интересный пример, представляет собой пример на рисунке~\labelcref{fig:test_sample3}. В области высоких частот ввиду близкого расположения левого полюса и левого нуля, обладающих взаимно компенсирующим действием, наблюдается ошибка детектирования и идентификации: левый полюс не детектирован; частота левого нуля идентифицирована с ошибкой 25\% (таблица~\ref{tbl:test_estim}).
 
 \begin{figure}[H]
 	\centering
@@ -121,9 +123,8 @@
 \end{table}
 
 
-
 \needspace{1\baselineskip}
-\subsection{Результаты инференса данных эксперимента}
+\subsection{Результаты детекции объектов и идентификации параметров в данных эксперимента}
 По частотным характеристикам, измеренным в серии экспериментов, выполнена идентификация параметров линейных звеньев системы автоматического регулирования источника питания. Инференс модели проведен как по характеристикам, измеренным внутрисхемно алгоритмом \ref{sec:fr_optim} (приложение~\ref{appendix:application}), так и по характеристикам, измеренным сертифицированным измерительным прибором AP300 Frequency Response Analyzer (приложение~\ref{appendix:bench}).
 
 Теоретически ожидается, что комплексный коэффициент передачи исследованных звеньев аппроксимируется следующими малосигнальными моделями:
@@ -152,8 +153,11 @@
 	\end{equation*}
 \end{itemize}
 
-Выбранные динамические звенья охватывают широкий спектр наборов полюсов/нулей, включая ноль на нулевой частоте (интеграторы 0-го и 1-го порядка), правый ноль и задержки по времени.
+Выбранные динамические звенья показательны: охватывают широкий спектр наборов полюсов/нулей, включая ноль на нулевой частоте (интеграторы 0-го и 1-го порядка), правый ноль и задержки по времени.
 
+В примере на рисунках~\labelcref{fig:Wui_detection,fig:fr_approx_calc_Wui,fig:Wui_delay_detection,fig:fr_approx_calc_Wui_delay} не детектирован левый ноль, ожидаемый исходя из теоретической модели динамического звена. Однако, в действительности этот левый ноль не проявился. Учет этого нуля снижает точность аппроксимации (рисунки~\labelcref{fig:fr_approx_model_Wui,fig:fr_approx_model_Wui_delay}).
+
+\clearpage
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PI_300_DP.pdf}
@@ -164,12 +168,30 @@
 
 \begin{figure}[H]
 	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_G_I_PI_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик ПИ-регулятора контура регулирования тока моделью типа \textbf{\enquote{1zp1lz}}}
+	\label{fig:fr_approx_calc_G_I_PI}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_U_PI_300_DP.pdf}
 
 	\caption{Частотные характеристики ПИ-регулятора контура стабилизации напряжения (внутрисхемное измерение)}
 	\label{fig:G_U_PI_detection}
 \end{figure}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_G_U_PI_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик ПИ-регулятора контура стабилизации напряжения моделью типа \textbf{\enquote{1zp1lz}}}
+	\label{fig:fr_approx_calc_G_U_PI}
+\end{figure}
+
+\clearpage
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/G_I_PID_300_DP.pdf}
@@ -180,12 +202,30 @@
 
 \begin{figure}[H]
 	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_G_I_PID_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик ПИД-регулятора контура регулирования тока моделью типа \textbf{\enquote{1zp2lz}}}
+	\label{fig:fr_approx_calc_G_I_PID}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_300_DP.pdf}
 
 	\caption{Частотные характеристики коэффициента преобразования тока в напряжение (внутрисхемное измерение)}
 	\label{fig:Wui_detection}
 \end{figure}
 
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Wui_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1rz}}}
+	\label{fig:fr_approx_calc_Wui}
+\end{figure}
+
+\clearpage
 \begin{figure}[H]
 	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/Wui_delay_300_DP.pdf}
@@ -196,6 +236,32 @@
 
 \begin{figure}[H]
 	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Wui_delay_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1rz}} с задержкой}
+	\label{fig:fr_approx_calc_Wui_delay}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Wui_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1lz1rz}}}
+	\label{fig:fr_approx_model_Wui}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_model_Wui_delay_300_DP.pdf}
+
+	\caption{Аппроксимация частотных характеристик коэффициента преобразования тока в напряжение моделью типа \textbf{\enquote{0zp1lp1lz1rz}} с задержкой}
+	\label{fig:fr_approx_model_Wui_delay}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/Zout_300_AP.pdf}
 
 	\caption{Частотные характеристики выходного импеданса выключенного источника питания (измерение внешним анализатором)}
@@ -204,8 +270,25 @@
 
 \begin{figure}[H]
 	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Zout_300_AP.pdf}
+
+	\caption{Аппроксимация частотных характеристик выходного импеданса выключенного источника питания моделью типа \textbf{\enquote{1zp1lz}}}
+	\label{fig:fr_approx_calc_Zout}
+\end{figure}
+
+\clearpage
+\begin{figure}[H]
+	\centering
 	\includegraphics [width=1.00\linewidth] {parametersEstimation/ZoutI_300_AP.pdf}
 
 	\caption{Частотные характеристики выходного импеданса источника питания в режиме стабилизации тока (измерение внешним анализатором)}
 	\label{fig:ZoutI_detection}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics [width=1.00\linewidth] {parametersEstimation/fr_approx_calc_Zouti_300_AP.pdf}
+
+	\caption{Аппроксимация частотных характеристик выходного импеданса источника питания в режиме стабилизации тока моделью типа \textbf{\enquote{0zp1lp1lz}}}
+	\label{fig:fr_approx_calc_Zouti}
 \end{figure}
