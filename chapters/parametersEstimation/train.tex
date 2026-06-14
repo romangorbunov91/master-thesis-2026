@@ -1,4 +1,4 @@
-\section{Обучение модели}
+\section{Обучение модели сегментации}
 
 \needspace{1\baselineskip}
 \subsection{Набор данных}
@@ -27,7 +27,7 @@
 \subsection{Функция потерь}
 Обучение производилось путем минимизации комбинированной функции потерь, вычисляемой по всем $N$ выходам декодера (глубокое супервизирование):
 \begin{equation}\label{eqn:lossfunc}
-    \mathcal{L} = \frac{1}{w} {\sum_{n=1}^{N} \Big[ w_n \Big( w^\text{BCE} \mathcal{L}_n^\text{BCE} + w^\text{Dice} \mathcal{L}_n^\text{Dice}} \Big) \Big],
+    \mathcal{L} = \frac{1}{w} {\sum_{n=1}^{N} \Big[ w_n \Big( w^\text{BCE} \mathord{\cdot} \mathcal{L}_n^\text{BCE} + w^\text{Dice} \mathord{\cdot} \mathcal{L}_n^\text{Dice}} \Big) \Big],
 \end{equation}
 где:
 \begin{itemize}
@@ -38,7 +38,7 @@
 
 Бинарная перекрестная энтропия
 \begin{equation*}
-    \mathcal{L}^\text{BCE} = -\frac{1}{L} \sum_{i=1}^{L} \Big[ y_i \log\left(p_i \right) + \left(1 - y_i\right) \log \left( 1 - p_i \right) \Big],
+    \mathcal{L}^\text{BCE} = -\frac{1}{L} \sum_{i=1}^{L} \Big[ y_i \mathord{\cdot} \log\left(p_i \right) + \left(1 - y_i\right) \mathord{\cdot} \log \left( 1 - p_i \right) \Big],
 \end{equation*}
 где:
 \begin{itemize}
@@ -64,8 +64,8 @@
 \end{equation*}
 где:
 \begin{itemize}
-    \item ${y_i}$ -- истинные (\enquote{ground truth}) значения маски, ${y_i \in \{0, 1\}}$;
-    \item ${\hat{y}_i}$ -- предсказания модели, ${\hat{y}_i \in \{0, 1\}}$.
+    \item ${\hat{y}_i}$ -- предсказания модели, ${\hat{y}_i \in \{0, 1\}}$;
+    \item ${y_i}$ -- истинные (\enquote{ground truth}) значения маски, ${y_i \in \{0, 1\}}$.
 \end{itemize}
 
 В качестве вспомогательной метрики применен коэффициент Жаккара:
@@ -73,7 +73,7 @@
     \text{IoU} = \frac{\sum_{i=1}^{L} \hat{y}_i \mathord{\cdot} y_i}{\sum_{i=1}^{L} \hat{y}_i + \sum_{i=1}^{L} y_i - \sum_{i=1}^{L} \hat{y}_i \mathord{\cdot} y_i + \varepsilon}.
 \end{equation*}
 
-Обучение выполнено на NVIDIA GeForce RTX3060 (12~ГБ), torch=2.6.0, CUDA=12.6, cuDNN=9.5.1 при следующих гиперпараметрах:
+Обучение выполнено на \textbf{NVIDIA GeForce RTX3060} (12~ГБ), torch=2.6.0, CUDA=12.6, cuDNN=9.5.1 при следующих гиперпараметрах:
 \begin{itemize}
     \item Количество уровней энкодера: ${N=4}$.
     \item Количество каналов (\enquote{фичей}):\par
