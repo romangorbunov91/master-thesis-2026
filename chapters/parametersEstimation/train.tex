@@ -47,7 +47,7 @@
 \end{itemize}
 и функция потерь Дайса
 \begin{equation*}
-    \mathcal{L}^{\text{Dice}} = 1 - 2 \frac{\sum_{i=1}^{L} d_i \mathord{\cdot} y_i}{\sum_{i=1}^{L} d_i + \sum_{i=1}^{L} y_i + \varepsilon},
+    \mathcal{L}^{\text{Dice}} = 1 - 2 \frac{\sum_{i=1}^{L} p_i \mathord{\cdot} y_i}{\sum_{i=1}^{L} p_i + \sum_{i=1}^{L} y_i + \varepsilon},
 \end{equation*}
 вычисляются по каждому каналу $\{1, C_\text{out}\}$; в функцию потерь \eqref{eqn:lossfunc} входят уже усредненные по каналам значения.
 
